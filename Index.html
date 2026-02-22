@@ -1,0 +1,454 @@
+<html lang="en">
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaf Stairlift Quoter</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
+        
+        /* LOGIN SCREEN STYLES */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0d2a1a; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-card { background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .logo-text { font-size: 32px; font-weight: bold; color: #0d2a1a; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .logo-text span { color: #4CAF50; }
+        .confidential-warning { color: #c0392b; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 25px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        .login-btn { width: 100%; background-color: #4CAF50; color: white; border: none; padding: 14px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+        .login-btn:hover { background-color: #45a049; }
+        
+        /* MAIN APP STYLES */
+        #mainApp { display: none; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #0d2a1a; }
+        .section { margin-bottom: 25px; padding: 15px; background: #fafafa; border: 1px solid #ddd; border-radius: 8px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        select, input[type="number"] { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        .checkbox-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 5px 0; border-bottom: 1px solid #eee; }
+        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; margin-right: 15px; }
+        .checkbox-group label { margin: 0; font-weight: normal; flex-grow: 1; }
+        .qty-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 5px 0; border-bottom: 1px solid #eee; }
+        .qty-group label { margin: 0; font-weight: normal; flex-grow: 1; }
+        .qty-group input[type="number"] { width: 80px; text-align: center; margin: 0; padding: 5px; }
+        .totals-box { background: #e8f4f8; padding: 15px; border-radius: 8px; border-left: 5px solid #3498db; margin-top: 20px; }
+        .totals-box h2 { margin-top: 0; color: #2980b9; }
+        .result-row { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
+        .commission { font-weight: bold; color: #27ae60; font-size: 20px; }
+        .finance-box { background: #fdfae6; border-left: 5px solid #f1c40f; }
+        .rep-box { background: #ecf0f1; border: 1px solid #bdc3c7; margin-top: 40px; }
+        hr { border: 0; height: 1px; background: #ddd; margin: 20px 0; }
+        .hidden { display: none; }
+        .warning { color: #c0392b; font-size: 14px; margin-top: 5px; font-weight: bold; }
+        .toggle-btn { background-color: #34495e; color: white; border: none; padding: 10px 15px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .sub-text { font-size: 14px; color: #555; border-bottom: none; margin-bottom: 2px; padding-bottom: 0; }
+    </style>
+</head>
+<body>
+
+<div id="loginScreen">
+    <div class="login-card">
+        <div class="logo-text"><span>🍃</span> LeafHome™</div>
+        <p style="margin-top: 0; color: #7f8c8d; font-size: 14px; margin-bottom: 20px;">Safety Solutions Quoter</p>
+        
+        <div class="confidential-warning">
+            Confidential Pricing Details Belonging To Leaf Home Solutions. All Violators Will Be Subject To Legal Action.
+        </div>
+        
+        <input type="text" id="usernameInput" placeholder="Username">
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button class="login-btn" onclick="checkLogin()">SECURE LOGIN</button>
+        <p id="loginError" style="color: #c0392b; font-weight: bold; display: none; margin-top: 15px;">Invalid Username or Password</p>
+    </div>
+</div>
+
+<div id="mainApp">
+    <div class="container">
+        <h1>Leaf Stairlift Quoter</h1>
+
+        <div class="section">
+            <h2>1. Select Lift Type</h2>
+            <select id="liftCategory" onchange="updateCategory(); calculate();">
+                <option value="none">-- Select Category --</option>
+                <option value="straight">Straight Indoor Lifts</option>
+                <option value="helix">Custom Curved Lifts (Helix)</option>
+                <option value="uplift">Curved Lifts (Uplift)</option>
+                <option value="outdoor">Outdoor Comfort Lifts</option>
+            </select>
+        </div>
+
+        <div id="buildSection" class="section hidden">
+            <h2>2. Build the Quote</h2>
+            
+            <div id="cat-straight" class="category-group hidden">
+                <label>Select Base Lift:</label>
+                <select class="base-lift" onchange="calculate()">
+                    <option value="0">-- Select --</option>
+                    <option value="7697">Comfort Leaf Lift 350 lbs - $7,697</option>
+                    <option value="10523">Comfort Leaf Lift w/ Folding Rail 350 lbs - $10,523</option>
+                    <option value="14984">SL600HD Bariatric 600 lbs (No Folding) - $14,984</option>
+                </select>
+                
+                <label>Rail Add-ons:</label>
+                <select class="straight-rail" onchange="calculate()">
+                    <option value="0">Included (Up to 16')</option>
+                    <option value="511">3' railing add-on - $511</option>
+                    <option value="850">5' railing add-on - $850</option>
+                    <option value="1358">8' railing add-on - $1,358</option>
+                </select>
+
+                <label>Hardware & Electrical:</label>
+                <div class="qty-group"><label>Chrome 16" or 24" Grab Bars ($350 ea)</label><input type="number" class="grab-bar-qty" value="0" min="0" oninput="calculate()"></div>
+                <div class="qty-group"><label>Grab Bar Finish Upgrade ($124 ea)</label><input type="number" class="finish-upgrade-qty" value="0" min="0" oninput="calculate()"></div>
+                <div class="checkbox-group"><label>Interior Outlet ($396)</label><input type="checkbox" class="addon-cb" value="396" onchange="calculate()"></div>
+                <div class="checkbox-group"><label>Low Voltage 8' Cord Add-on ($175)</label><input type="checkbox" class="addon-cb" value="175" onchange="calculate()"></div>
+            </div>
+
+            <div id="cat-helix" class="category-group hidden">
+                <div class="warning">⚠️ Helix Lifts ALWAYS require a 25% minimum deposit.</div>
+                <label>Select Base Lift:</label>
+                <select class="base-lift" onchange="calculate()">
+                    <option value="0">-- Select --</option>
+                    <option value="29769">CSL500 Helix (All turns, up to 24') - $29,769</option>
+                    <option value="21698">CSL580-18 Helix (18', 1x180° turn) - $21,698</option>
+                    <option value="24281">CSL580-24 Helix (24', 1x180° turn) - $24,281</option>
+                    <option value="20982">CSL590-18 Helix (18', 1x90° turn) - $20,982</option>
+                    <option value="23565">CSL590-24 Helix (24', 1x90° turn) - $23,565</option>
+                    <option value="34710">CSL-570 Sweeping Curve (up to 24') - $34,710</option>
+                </select>
+
+                <label>Hardware Add-ons:</label>
+                <div class="qty-group"><label>Linear Ft Rail Add-on above 24' ($454/ft)</label><input type="number" class="helix-rail-ft" value="0" min="0" oninput="calculate()"></div>
+                <div class="qty-group"><label>Custom Park 90° or 180° ($6,250 ea)</label><input type="number" class="helix-park-qty" value="0" min="0" oninput="calculate()"></div>
+                <div class="checkbox-group"><label>Add-on Charging Station for Mid Landing ($1,450)</label><input type="checkbox" class="addon-cb" value="1450" onchange="calculate()"></div>
+            </div>
+
+            <div id="cat-uplift" class="category-group hidden">
+                <div class="warning">⚠️ Uplift maximum weight capacity is 250 lbs.</div>
+                <label>Select Base Lift:</label>
+                <select class="base-lift" onchange="calculate()">
+                    <option value="0">-- Select --</option>
+                    <option value="29769">Uplift 360 Degree Pkg (27' incl) - $29,769</option>
+                    <option value="23565">Uplift 180 Degree Pkg (24' incl) - $23,565</option>
+                </select>
+
+                <label>Hardware Add-ons:</label>
+                <div class="qty-group"><label>Additional Linear Footage ($250/ft)</label><input type="number" class="uplift-rail-ft" value="0" min="0" oninput="calculate()"></div>
+                <div class="qty-group"><label>Add 180° Park or Turn ($6,250 ea)</label><input type="number" class="uplift-180-qty" value="0" min="0" oninput="calculate()"></div>
+                <div class="qty-group"><label>Add 90° Park or Turn ($3,125 ea)</label><input type="number" class="uplift-90-qty" value="0" min="0" oninput="calculate()"></div>
+                <div class="checkbox-group"><label>Uplift Folding Rail Add-on ($3,350)</label><input type="checkbox" class="addon-cb" value="3350" onchange="calculate()"></div>
+                <div class="checkbox-group"><label>Add-on Charging Station for Mid Landing ($1,450)</label><input type="checkbox" class="addon-cb" value="1450" onchange="calculate()"></div>
+            </div>
+
+            <div id="cat-outdoor" class="category-group hidden">
+                <label>Select Base Lift:</label>
+                <select class="base-lift" onchange="calculate()">
+                    <option value="0">-- Select --</option>
+                    <option value="15681">Outdoor Comfort Lift (Up to 16' max) - $15,681</option>
+                    <option value="18047">Outdoor Comfort Lift (16'1" to 24' max) - $18,047</option>
+                </select>
+
+                <label>Hardware & Labor Add-ons:</label>
+                <div class="qty-group"><label>Burial Charge for Elec. Lines ($370 per 20ft)</label><input type="number" class="burial-qty" value="0" min="0" oninput="calculate()"></div>
+                <div class="qty-group"><label>Additional Labor ($95/hour)</label><input type="number" class="labor-qty" value="0" min="0" oninput="calculate()"></div>
+                <div class="checkbox-group"><label>Add Outdoor Outlet ($625)</label><input type="checkbox" class="addon-cb" value="625" onchange="calculate()"></div>
+            </div>
+
+            <div id="universal-addons" class="category-group hidden" style="margin-top: 20px; border-top: 2px solid #ccc; padding-top: 15px;">
+                <div class="checkbox-group"><label><strong>Remove Existing Lift & Dispose ($389)</strong></label><input type="checkbox" id="universal-removal" value="389" onchange="calculate()"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. Adjust Pricing</h2>
+            <label>Show Price Add-on (%):</label>
+            <input type="number" id="showPricePercent" value="10" min="0" max="100" oninput="calculate()" placeholder="Enter Add-on % (e.g., 10)">
+
+            <label>Customer Discount (Off Retail Base %):</label>
+            <input type="number" id="discountPercent" value="0" min="0" max="40" oninput="calculate()" placeholder="Enter Discount % (e.g., 15)">
+            
+            <label>Required Deposit (%):</label>
+            <select id="downPaymentPercent" onchange="calculate()">
+                <option value="0.10">10% (Standard)</option>
+                <option value="0.25">25% (Helix Custom Curve)</option>
+            </select>
+            
+            <label>Custom Flat Deposit ($) - Overrides %:</label>
+            <input type="number" id="downPaymentFlat" value="" min="0" oninput="calculate()" placeholder="Enter custom amount">
+        </div>
+
+        <div class="section totals-box">
+            <h2>4. Presentation Numbers</h2>
+            <div class="result-row"><span>SHOW PRICE (Initial Offer):</span> <span id="displayShowPrice">$0.00</span></div>
+            <div class="result-row"><span>RETAIL PRICE (Add-on Removed):</span> <span id="displayRetailPrice">$0.00</span></div>
+            <div class="result-row" style="font-weight: bold; color: #c0392b;"><span>FINAL CLOSING PRICE:</span> <span id="displayFinalPrice">$0.00</span></div>
+            <div class="result-row" style="margin-top: 15px;"><span>AMOUNT DUE TODAY:</span> <span id="displayDue">$0.00</span></div>
+            <div class="result-row"><span>REMAINING BALANCE:</span> <span id="displayBalance">$0.00</span></div>
+        </div>
+
+        <div class="section totals-box finance-box">
+            <h2>5. Financing Options</h2>
+            <label>Select Finance Plan:</label>
+            <select id="financePlan" onchange="calculate()">
+                <option value="-1" data-fee="0">-- Select a Plan --</option>
+                
+                <optgroup label="SERVICE FINANCE: Deferred Int / Min Pymts">
+                    <option value="0.01" data-fee="0.0375">Plan 1006: 6 Mos Def. Int w/ Min Pymt (3.75% Fee)</option>
+                    <option value="0.01" data-fee="0.0500">Plan 1012: 12 Mos Def. Int w/ Min Pymt (5.00% Fee)</option>
+                    <option value="0.01" data-fee="0.0550">Plan 1018: 18 Mos Def. Int w/ Min Pymt (5.50% Fee)</option>
+                    <option value="0.01" data-fee="0.0775">Plan 1024: 24 Mos Def. Int w/ Min Pymt (7.75% Fee)</option>
+                </optgroup>
+                
+                <optgroup label="SERVICE FINANCE: Same As Cash (No Pymts)">
+                    <option value="0" data-fee="0.0375">Plan 2003: 3 Mos SAC (3.75% Fee)</option>
+                    <option value="0" data-fee="0.0400">Plan 2006: 6 Mos SAC (4.00% Fee)</option>
+                    <option value="0" data-fee="0.0550">Plan 2012: 12 Mos SAC (5.50% Fee)</option>
+                    <option value="0" data-fee="0.0875">Plan 2018: 18 Mos SAC (8.75% Fee)</option>
+                    <option value="0" data-fee="0.1250">Plan 2024: 24 Mos SAC (12.50% Fee)</option>
+                </optgroup>
+                
+                <optgroup label="SERVICE FINANCE: Equal Monthly Pymts (Zero Int)">
+                    <option value="0.040000" data-fee="0.0925">Plan 3025: 25 Mos Equal Pymts (9.25% Fee)</option>
+                    <option value="0.027777" data-fee="0.1300">Plan 3036: 36 Mos Equal Pymts (13.00% Fee)</option>
+                    <option value="0.020833" data-fee="0.1400">Plan 3048: 48 Mos Equal Pymts (14.00% Fee)</option>
+                    <option value="0.016666" data-fee="0.1500">Plan 3060: 60 Mos Equal Pymts (15.00% Fee)</option>
+                    <option value="0.013888" data-fee="0.1800">Plan 3072: 72 Mos Equal Pymts (18.00% Fee)</option>
+                </optgroup>
+                
+                <optgroup label="SERVICE FINANCE: Reduced Interest Loans">
+                    <option value="0.0082" data-fee="0.2100">Plan 4082: 144 Mos @ 2.99% (0.82% PF, 21.00% Fee)</option>
+                    <option value="0.0092" data-fee="0.0975">Plan 4092: 144 Mos @ 4.99% (0.92% PF, 9.75% Fee)</option>
+                    <option value="0.0071" data-fee="0.1700">Plan 4071: 240 Mos @ 5.99% (0.71% PF, 17.00% Fee)</option>
+                    <option value="0.0198" data-fee="0.0500">Plan 4198: 60 Mos @ 6.99% (1.98% PF, 5.00% Fee)</option>
+                    <option value="0.0116" data-fee="0.0500">Plan 4116: 120 Mos @ 6.99% (1.16% PF, 5.00% Fee)</option>
+                    <option value="0.0102" data-fee="0.0650">Plan 4102: 144 Mos @ 6.99% (1.02% PF, 6.50% Fee)</option>
+                    <option value="0.0089" data-fee="0.0650">Plan 4089: 180 Mos @ 6.99% (0.89% PF, 6.50% Fee)</option>
+                    <option value="0.0202" data-fee="0.0300">Plan 4202: 60 Mos @ 7.99% (2.02% PF, 3.00% Fee)</option>
+                    <option value="0.0121" data-fee="0.0300">Plan 4121: 120 Mos @ 7.99% (1.21% PF, 3.00% Fee)</option>
+                    <option value="0.0108" data-fee="0.0300">Plan 4108: 144 Mos @ 7.99% (1.08% PF, 3.00% Fee)</option>
+                    <option value="0.0096" data-fee="0.0300">Plan 4096: 180 Mos @ 7.99% (0.96% PF, 3.00% Fee)</option>
+                    <option value="0.0212" data-fee="0.0400">Plan 4212: 60 Mos @ 9.99% (2.12% PF, 4.00% Fee)</option>
+                    <option value="0.0165" data-fee="0.0490">Plan 4165: 85 Mos @ 9.99% (1.65% PF, 4.90% Fee)</option>
+                    <option value="0.0158" data-fee="0.0350">Plan 4158: 90 Mos @ 9.99% (1.58% PF, 3.50% Fee)</option>
+                    <option value="0.0150" data-fee="0.0550">Plan 4150: 97 Mos @ 9.99% (1.50% PF, 5.50% Fee)</option>
+                    <option value="0.0132" data-fee="0.0000">Plan 4132: 120 Mos @ 9.99% (1.32% PF, 0% Fee)</option>
+                    <option value="0.0119" data-fee="0.0200">Plan 4119: 144 Mos @ 9.99% (1.19% PF, 2.00% Fee)</option>
+                    <option value="0.0107" data-fee="0.0200">Plan 4107: 180 Mos @ 9.99% (1.07% PF, 2.00% Fee)</option>
+                    <option value="0.0176" data-fee="0.0200">Plan 4011: 84 Mos @ 11.99% (1.76% PF, 2.00% Fee)</option>
+                    <option value="0.0181" data-fee="0.0000">Plan 4012: 84 Mos @ 12.99% (1.81% PF, 0% Fee)</option>
+                </optgroup>
+
+                <optgroup label="SERVICE FINANCE: Hybrid Loans (Deferred Pymts)">
+                    <option value="0.0198" data-fee="0.0550">Plan 4398: 3 Mos NINP + 60 Mos @ 6.99% (1.98% PF, 5.50% Fee)</option>
+                    <option value="0.0116" data-fee="0.0550">Plan 4316: 3 Mos NINP + 120 Mos @ 6.99% (1.16% PF, 5.50% Fee)</option>
+                    <option value="0.0212" data-fee="0.0150">Plan 4312: 3 Mos NINP + 60 Mos @ 9.99% (2.12% PF, 1.50% Fee)</option>
+                    <option value="0.0132" data-fee="0.0200">Plan 4332: 3 Mos NINP + 120 Mos @ 9.99% (1.32% PF, 2.00% Fee)</option>
+                    <option value="0.0212" data-fee="0.0350">Plan 4612: 6 Mos NINP + 60 Mos @ 9.99% (2.12% PF, 3.50% Fee)</option>
+                    <option value="0.0132" data-fee="0.0500">Plan 4632: 6 Mos NINP + 120 Mos @ 9.99% (1.32% PF, 5.00% Fee)</option>
+                </optgroup>
+
+                <optgroup label="FOUNDATION FINANCE: Revolving">
+                    <option value="0.0200" data-fee="0.0000">Standard Rate: 17.99% (2.00% PF, Free)</option>
+                    <option value="0.0150" data-fee="0.0250">Buy-down 10.9-13.5% (1.50% PF, Varies - e.g. 2.5%)</option>
+                    <option value="0.0125" data-fee="0.0500">Buy-down 9.9% (1.25% PF, Varies - e.g. 5.0%)</option>
+                </optgroup>
+            </select>
+            
+            <div class="result-row sub-text" style="margin-top: 15px;"><span>Base Balance:</span> <span id="displayBaseBalance">$0.00</span></div>
+            <div class="result-row sub-text"><span>Finance Fee Added:</span> <span id="displayFinanceFee">$0.00</span></div>
+            <div class="result-row sub-text" style="font-weight: bold;"><span>Total Financed Amount:</span> <span id="displayTotalFinanced">$0.00</span></div>
+            
+            <div class="result-row" style="margin-top: 15px; font-weight: bold; font-size: 20px;"><span>EST. MONTHLY PAYMENT:</span> <span id="displayMonthly">$0.00</span></div>
+        </div>
+
+        <div class="section rep-box">
+            <button class="toggle-btn" id="toggleCommBtn" onclick="toggleCommission()">For Sales Rep Use ONLY</button>
+            <div id="commissionContainer" class="hidden" style="margin-top: 15px;">
+                <div class="result-row commission"><span>YOUR COMMISSION:</span> <span id="displayCommission">$0.00</span></div>
+                <div style="font-size: 13px; color: #7f8c8d; margin-top: 5px;">*Financed deals may incur an estimated 1%-2% commission deduction depending on the plan chosen.</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // LOGIN LOGIC
+    function checkLogin() {
+        const user = document.getElementById('usernameInput').value;
+        const pass = document.getElementById('passwordInput').value;
+        const errorMsg = document.getElementById('loginError');
+        
+        if (user === 'LHSSREP' && pass === 'Leafhome2026!') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+        } else {
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    // APP LOGIC
+    function updateCategory() {
+        const cat = document.getElementById('liftCategory').value;
+        
+        // Hide all build sections
+        document.querySelectorAll('.category-group').forEach(el => el.classList.add('hidden'));
+        document.getElementById('buildSection').classList.add('hidden');
+        
+        // Reset inputs
+        document.querySelectorAll('.base-lift, .straight-rail').forEach(el => el.value = "0");
+        document.querySelectorAll('input[type="number"]:not(#showPricePercent):not(#discountPercent)').forEach(el => el.value = "0");
+        document.getElementById('downPaymentFlat').value = "";
+        document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+        document.getElementById('financePlan').value = "-1";
+        
+        // Show selected section
+        if (cat !== 'none') {
+            document.getElementById('buildSection').classList.remove('hidden');
+            document.getElementById('cat-' + cat).classList.remove('hidden');
+            document.getElementById('universal-addons').classList.remove('hidden');
+            
+            // Auto-set down payment requirements
+            const dpSelect = document.getElementById('downPaymentPercent');
+            if (cat === 'helix') {
+                dpSelect.value = "0.25";
+            } else {
+                dpSelect.value = "0.10";
+            }
+        }
+    }
+
+    function toggleCommission() {
+        const commDiv = document.getElementById('commissionContainer');
+        const btn = document.getElementById('toggleCommBtn');
+        if (commDiv.classList.contains('hidden')) {
+            commDiv.classList.remove('hidden');
+            btn.innerText = "Hide Rep Section";
+        } else {
+            commDiv.classList.add('hidden');
+            btn.innerText = "For Sales Rep Use ONLY";
+        }
+    }
+
+    function calculate() {
+        const cat = document.getElementById('liftCategory').value;
+        if (cat === 'none') return;
+
+        const adminFee = 500;
+        const activeContainer = document.getElementById('cat-' + cat);
+        
+        // Get Base Lift Price
+        let retailBase = parseFloat(activeContainer.querySelector('.base-lift').value) || 0;
+        
+        // Add Checkboxes
+        activeContainer.querySelectorAll('.addon-cb:checked').forEach(cb => {
+            retailBase += parseFloat(cb.value);
+        });
+        
+        // Add Universal Removal if checked
+        if (document.getElementById('universal-removal').checked) {
+            retailBase += 389;
+        }
+
+        // Add Category-Specific Multipliers
+        if (cat === 'straight') {
+            retailBase += parseFloat(activeContainer.querySelector('.straight-rail').value) || 0;
+            retailBase += (parseFloat(activeContainer.querySelector('.grab-bar-qty').value) || 0) * 350;
+            retailBase += (parseFloat(activeContainer.querySelector('.finish-upgrade-qty').value) || 0) * 124;
+        } 
+        else if (cat === 'helix') {
+            retailBase += (parseFloat(activeContainer.querySelector('.helix-rail-ft').value) || 0) * 454;
+            retailBase += (parseFloat(activeContainer.querySelector('.helix-park-qty').value) || 0) * 6250;
+        }
+        else if (cat === 'uplift') {
+            retailBase += (parseFloat(activeContainer.querySelector('.uplift-rail-ft').value) || 0) * 250;
+            retailBase += (parseFloat(activeContainer.querySelector('.uplift-180-qty').value) || 0) * 6250;
+            retailBase += (parseFloat(activeContainer.querySelector('.uplift-90-qty').value) || 0) * 3125;
+        }
+        else if (cat === 'outdoor') {
+            retailBase += (parseFloat(activeContainer.querySelector('.burial-qty').value) || 0) * 370;
+            retailBase += (parseFloat(activeContainer.querySelector('.labor-qty').value) || 0) * 95;
+        }
+
+        // Modifiers 
+        let showPriceInput = parseFloat(document.getElementById('showPricePercent').value) || 0;
+        let discountInput = parseFloat(document.getElementById('discountPercent').value) || 0;
+        
+        let showPriceMult = showPriceInput / 100;
+        let discount = discountInput / 100;
+
+        // Pricing Math
+        let showPrice = retailBase === 0 ? 0 : (retailBase * (1 + showPriceMult)) + adminFee;
+        let retailPrice = retailBase === 0 ? 0 : retailBase + adminFee;
+        let finalPrice = retailBase === 0 ? 0 : (retailBase * (1 - discount)) + adminFee;
+
+        // Commission Logic
+        let commission = 0;
+        let commText = "";
+        if (retailBase > 0) {
+            if (discount <= 0.10) { commission = retailBase * (1 - discount) * 0.12; commText = " (12% Max)"; }
+            else if (discount <= 0.15) { commission = retailBase * (1 - discount) * 0.10; commText = " (10%)"; }
+            else if (discount <= 0.20) { commission = retailBase * (1 - discount) * 0.08; commText = " (8%)"; }
+            else if (discount <= 0.25) { commission = retailBase * (1 - discount) * 0.05; commText = " (5% PAR)"; }
+            else if (discount <= 0.40) { commission = 200; commText = " (Flat Payout)"; }
+            else { commission = 0; commText = " (Max discount exceeded)"; }
+        }
+
+        // Down Payment Math
+        let dpPercent = parseFloat(document.getElementById('downPaymentPercent').value);
+        let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
+        let amountDue = 0;
+        
+        if (dpFlat > 0) {
+            amountDue = dpFlat;
+        } else {
+            amountDue = finalPrice * dpPercent;
+        }
+        
+        if (cat === 'uplift' && dpFlat === 0 && amountDue > 0 && amountDue < 1000) {
+            amountDue = 1000;
+        }
+
+        let balance = retailBase === 0 ? 0 : finalPrice - amountDue;
+        if (balance < 0) balance = 0; 
+
+        // Comprehensive Finance Math (Passing fee to customer)
+        let financeSelect = document.getElementById('financePlan');
+        let selectedOption = financeSelect.options[financeSelect.selectedIndex];
+        
+        let pfRate = parseFloat(selectedOption.value) || 0;
+        let dealerFeeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
+
+        let financeFeeAmount = balance * dealerFeeRate;
+        let totalFinancedAmount = balance + financeFeeAmount;
+        let monthly = totalFinancedAmount * pfRate;
+
+        // Display Formatting
+        const formatMoney = (num) => '$' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        document.getElementById('displayShowPrice').innerText = formatMoney(showPrice);
+        document.getElementById('displayRetailPrice').innerText = formatMoney(retailPrice);
+        document.getElementById('displayFinalPrice').innerText = formatMoney(finalPrice);
+        document.getElementById('displayDue').innerText = formatMoney(amountDue);
+        document.getElementById('displayBalance').innerText = formatMoney(balance);
+        document.getElementById('displayCommission').innerText = retailBase > 0 ? formatMoney(commission) + commText : "$0.00";
+        
+        // Populate Finance Display breakdown
+        document.getElementById('displayBaseBalance').innerText = formatMoney(balance);
+        document.getElementById('displayFinanceFee').innerText = formatMoney(financeFeeAmount);
+        document.getElementById('displayTotalFinanced').innerText = formatMoney(totalFinancedAmount);
+        
+        // Handle Monthly Payment display logic based on selection
+        if (financeSelect.value === "-1") {
+            document.getElementById('displayMonthly').innerText = "$0.00";
+        } else if (retailBase > 0 && pfRate > 0) {
+            document.getElementById('displayMonthly').innerText = formatMoney(monthly) + " /mo";
+        } else if (retailBase > 0 && pfRate === 0 && selectedOption.innerText.includes("SAC")) {
+            document.getElementById('displayMonthly').innerText = "$0.00 /mo (During Promo)";
+        } else if (retailBase > 0 && pfRate === 0) {
+            document.getElementById('displayMonthly').innerText = "$0.00 /mo";
+        }
+    }
+</script>
+
+</body>
+</html>
