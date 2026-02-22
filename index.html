@@ -1,5 +1,5 @@
-<html lang="en">
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,8 +20,11 @@
         /* MAIN APP STYLES */
         #mainApp { display: none; padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1, h2, h3 { color: #0d2a1a; }
+        h1, h2, h3 { color: #0d2a1a; margin-top: 0; }
         .section { margin-bottom: 25px; padding: 15px; background: #fafafa; border: 1px solid #ddd; border-radius: 8px; }
+        .lift-block { border: 2px solid #2c3e50; background: #ffffff; position: relative; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .remove-btn { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .add-lift-btn { background-color: #2980b9; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         label { display: block; margin-top: 10px; font-weight: bold; }
         select, input[type="number"] { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
         .checkbox-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 5px 0; border-bottom: 1px solid #eee; }
@@ -37,10 +40,11 @@
         .finance-box { background: #fdfae6; border-left: 5px solid #f1c40f; }
         .rep-box { background: #ecf0f1; border: 1px solid #bdc3c7; margin-top: 40px; }
         hr { border: 0; height: 1px; background: #ddd; margin: 20px 0; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .warning { color: #c0392b; font-size: 14px; margin-top: 5px; font-weight: bold; }
         .toggle-btn { background-color: #34495e; color: white; border: none; padding: 10px 15px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; }
         .sub-text { font-size: 14px; color: #555; border-bottom: none; margin-bottom: 2px; padding-bottom: 0; }
+        .per-lift-pricing { background: #eef2f5; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #d5dce3; }
     </style>
 </head>
 <body>
@@ -63,113 +67,18 @@
 
 <div id="mainApp">
     <div class="container">
-        <h1>Leaf Stairlift Quoter</h1>
+        <h1 style="text-align: center; border-bottom: 2px solid #0d2a1a; padding-bottom: 10px; margin-bottom: 20px;">Master Quote Builder</h1>
+
+        <div id="lifts-container"></div>
+        
+        <button class="add-lift-btn" onclick="addLift()">➕ Add Another Lift</button>
 
         <div class="section">
-            <h2>1. Select Lift Type</h2>
-            <select id="liftCategory" onchange="updateCategory(); calculate();">
-                <option value="none">-- Select Category --</option>
-                <option value="straight">Straight Indoor Lifts</option>
-                <option value="helix">Custom Curved Lifts (Helix)</option>
-                <option value="uplift">Curved Lifts (Uplift)</option>
-                <option value="outdoor">Outdoor Comfort Lifts</option>
-            </select>
-        </div>
-
-        <div id="buildSection" class="section hidden">
-            <h2>2. Build the Quote</h2>
-            
-            <div id="cat-straight" class="category-group hidden">
-                <label>Select Base Lift:</label>
-                <select class="base-lift" onchange="calculate()">
-                    <option value="0">-- Select --</option>
-                    <option value="7697">Comfort Leaf Lift 350 lbs - $7,697</option>
-                    <option value="10523">Comfort Leaf Lift w/ Folding Rail 350 lbs - $10,523</option>
-                    <option value="14984">SL600HD Bariatric 600 lbs (No Folding) - $14,984</option>
-                </select>
-                
-                <label>Rail Add-ons:</label>
-                <select class="straight-rail" onchange="calculate()">
-                    <option value="0">Included (Up to 16')</option>
-                    <option value="511">3' railing add-on - $511</option>
-                    <option value="850">5' railing add-on - $850</option>
-                    <option value="1358">8' railing add-on - $1,358</option>
-                </select>
-
-                <label>Hardware & Electrical:</label>
-                <div class="qty-group"><label>Chrome 16" or 24" Grab Bars ($350 ea)</label><input type="number" class="grab-bar-qty" value="0" min="0" oninput="calculate()"></div>
-                <div class="qty-group"><label>Grab Bar Finish Upgrade ($124 ea)</label><input type="number" class="finish-upgrade-qty" value="0" min="0" oninput="calculate()"></div>
-                <div class="checkbox-group"><label>Interior Outlet ($396)</label><input type="checkbox" class="addon-cb" value="396" onchange="calculate()"></div>
-                <div class="checkbox-group"><label>Low Voltage 8' Cord Add-on ($175)</label><input type="checkbox" class="addon-cb" value="175" onchange="calculate()"></div>
-            </div>
-
-            <div id="cat-helix" class="category-group hidden">
-                <div class="warning">⚠️ Helix Lifts ALWAYS require a 25% minimum deposit.</div>
-                <label>Select Base Lift:</label>
-                <select class="base-lift" onchange="calculate()">
-                    <option value="0">-- Select --</option>
-                    <option value="29769">CSL500 Helix (All turns, up to 24') - $29,769</option>
-                    <option value="21698">CSL580-18 Helix (18', 1x180° turn) - $21,698</option>
-                    <option value="24281">CSL580-24 Helix (24', 1x180° turn) - $24,281</option>
-                    <option value="20982">CSL590-18 Helix (18', 1x90° turn) - $20,982</option>
-                    <option value="23565">CSL590-24 Helix (24', 1x90° turn) - $23,565</option>
-                    <option value="34710">CSL-570 Sweeping Curve (up to 24') - $34,710</option>
-                </select>
-
-                <label>Hardware Add-ons:</label>
-                <div class="qty-group"><label>Linear Ft Rail Add-on above 24' ($454/ft)</label><input type="number" class="helix-rail-ft" value="0" min="0" oninput="calculate()"></div>
-                <div class="qty-group"><label>Custom Park 90° or 180° ($6,250 ea)</label><input type="number" class="helix-park-qty" value="0" min="0" oninput="calculate()"></div>
-                <div class="checkbox-group"><label>Add-on Charging Station for Mid Landing ($1,450)</label><input type="checkbox" class="addon-cb" value="1450" onchange="calculate()"></div>
-            </div>
-
-            <div id="cat-uplift" class="category-group hidden">
-                <div class="warning">⚠️ Uplift maximum weight capacity is 250 lbs.</div>
-                <label>Select Base Lift:</label>
-                <select class="base-lift" onchange="calculate()">
-                    <option value="0">-- Select --</option>
-                    <option value="29769">Uplift 360 Degree Pkg (27' incl) - $29,769</option>
-                    <option value="23565">Uplift 180 Degree Pkg (24' incl) - $23,565</option>
-                </select>
-
-                <label>Hardware Add-ons:</label>
-                <div class="qty-group"><label>Additional Linear Footage ($250/ft)</label><input type="number" class="uplift-rail-ft" value="0" min="0" oninput="calculate()"></div>
-                <div class="qty-group"><label>Add 180° Park or Turn ($6,250 ea)</label><input type="number" class="uplift-180-qty" value="0" min="0" oninput="calculate()"></div>
-                <div class="qty-group"><label>Add 90° Park or Turn ($3,125 ea)</label><input type="number" class="uplift-90-qty" value="0" min="0" oninput="calculate()"></div>
-                <div class="checkbox-group"><label>Uplift Folding Rail Add-on ($3,350)</label><input type="checkbox" class="addon-cb" value="3350" onchange="calculate()"></div>
-                <div class="checkbox-group"><label>Add-on Charging Station for Mid Landing ($1,450)</label><input type="checkbox" class="addon-cb" value="1450" onchange="calculate()"></div>
-            </div>
-
-            <div id="cat-outdoor" class="category-group hidden">
-                <label>Select Base Lift:</label>
-                <select class="base-lift" onchange="calculate()">
-                    <option value="0">-- Select --</option>
-                    <option value="15681">Outdoor Comfort Lift (Up to 16' max) - $15,681</option>
-                    <option value="18047">Outdoor Comfort Lift (16'1" to 24' max) - $18,047</option>
-                </select>
-
-                <label>Hardware & Labor Add-ons:</label>
-                <div class="qty-group"><label>Burial Charge for Elec. Lines ($370 per 20ft)</label><input type="number" class="burial-qty" value="0" min="0" oninput="calculate()"></div>
-                <div class="qty-group"><label>Additional Labor ($95/hour)</label><input type="number" class="labor-qty" value="0" min="0" oninput="calculate()"></div>
-                <div class="checkbox-group"><label>Add Outdoor Outlet ($625)</label><input type="checkbox" class="addon-cb" value="625" onchange="calculate()"></div>
-            </div>
-
-            <div id="universal-addons" class="category-group hidden" style="margin-top: 20px; border-top: 2px solid #ccc; padding-top: 15px;">
-                <div class="checkbox-group"><label><strong>Remove Existing Lift & Dispose ($389)</strong></label><input type="checkbox" id="universal-removal" value="389" onchange="calculate()"></div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>3. Adjust Pricing</h2>
-            <label>Show Price Add-on (%):</label>
-            <input type="number" id="showPricePercent" value="10" min="0" max="100" oninput="calculate()" placeholder="Enter Add-on % (e.g., 10)">
-
-            <label>Customer Discount (Off Retail Base %):</label>
-            <input type="number" id="discountPercent" value="0" min="0" max="40" oninput="calculate()" placeholder="Enter Discount % (e.g., 15)">
-            
+            <h2>Contract Down Payment</h2>
             <label>Required Deposit (%):</label>
             <select id="downPaymentPercent" onchange="calculate()">
                 <option value="0.10">10% (Standard)</option>
-                <option value="0.25">25% (Helix Custom Curve)</option>
+                <option value="0.25">25% (Helix Custom Curve / Forced)</option>
             </select>
             
             <label>Custom Flat Deposit ($) - Overrides %:</label>
@@ -177,16 +86,19 @@
         </div>
 
         <div class="section totals-box">
-            <h2>4. Presentation Numbers</h2>
+            <h2>Grand Totals Presentation</h2>
             <div class="result-row"><span>SHOW PRICE (Initial Offer):</span> <span id="displayShowPrice">$0.00</span></div>
-            <div class="result-row"><span>RETAIL PRICE (Add-on Removed):</span> <span id="displayRetailPrice">$0.00</span></div>
+            <div class="result-row"><span>RETAIL PRICE (Add-ons Removed):</span> <span id="displayRetailPrice">$0.00</span></div>
             <div class="result-row" style="font-weight: bold; color: #c0392b;"><span>FINAL CLOSING PRICE:</span> <span id="displayFinalPrice">$0.00</span></div>
+            <div style="font-size: 12px; color: #7f8c8d; text-align: right; margin-top: -5px; margin-bottom: 10px;">*Includes standard $500 Contract Admin Fee</div>
+            
+            <hr>
             <div class="result-row" style="margin-top: 15px;"><span>AMOUNT DUE TODAY:</span> <span id="displayDue">$0.00</span></div>
             <div class="result-row"><span>REMAINING BALANCE:</span> <span id="displayBalance">$0.00</span></div>
         </div>
 
         <div class="section totals-box finance-box">
-            <h2>5. Financing Options</h2>
+            <h2>Financing Options</h2>
             <label>Select Finance Plan:</label>
             <select id="financePlan" onchange="calculate()">
                 <option value="-1" data-fee="0">-- Select a Plan --</option>
@@ -263,15 +175,120 @@
         <div class="section rep-box">
             <button class="toggle-btn" id="toggleCommBtn" onclick="toggleCommission()">For Sales Rep Use ONLY</button>
             <div id="commissionContainer" class="hidden" style="margin-top: 15px;">
-                <div class="result-row commission"><span>YOUR COMMISSION:</span> <span id="displayCommission">$0.00</span></div>
-                <div style="font-size: 13px; color: #7f8c8d; margin-top: 5px;">*Financed deals may incur an estimated 1%-2% commission deduction depending on the plan chosen.</div>
+                <div class="result-row commission"><span>MASTER COMMISSION:</span> <span id="displayCommission">$0.00</span></div>
+                <div style="font-size: 13px; color: #7f8c8d; margin-top: 5px;">*Combined payout from all listed lifts. Financed deals may incur an estimated 1%-2% commission deduction.</div>
             </div>
         </div>
 
     </div>
 </div>
 
+<template id="lift-template">
+    <div class="lift-block">
+        <button class="remove-btn" onclick="removeLift(this)">X Remove Lift</button>
+        <h2 class="lift-title" style="color: #2c3e50; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Lift 1</h2>
+        
+        <label>Select Lift Category:</label>
+        <select class="lift-category" onchange="updateCategory(this); calculate();">
+            <option value="none">-- Select Category --</option>
+            <option value="straight">Straight Indoor Lifts</option>
+            <option value="helix">Custom Curved Lifts (Helix)</option>
+            <option value="uplift">Curved Lifts (Uplift)</option>
+            <option value="outdoor">Outdoor Comfort Lifts</option>
+        </select>
+
+        <div class="cat-straight category-group hidden">
+            <label>Select Base Lift:</label>
+            <select class="base-lift" onchange="calculate()">
+                <option value="0">-- Select --</option>
+                <option value="7697">Comfort Leaf Lift 350 lbs - $7,697</option>
+                <option value="10523">Comfort Leaf Lift w/ Folding Rail 350 lbs - $10,523</option>
+                <option value="14984">SL600HD Bariatric 600 lbs (No Folding) - $14,984</option>
+            </select>
+            
+            <label>Rail Add-ons:</label>
+            <select class="straight-rail" onchange="calculate()">
+                <option value="0">Included (Up to 16')</option>
+                <option value="511">3' railing add-on - $511</option>
+                <option value="850">5' railing add-on - $850</option>
+                <option value="1358">8' railing add-on - $1,358</option>
+            </select>
+
+            <label>Hardware & Electrical:</label>
+            <div class="qty-group"><label>Chrome 16" or 24" Grab Bars ($350 ea)</label><input type="number" class="grab-bar-qty" value="0" min="0" oninput="calculate()"></div>
+            <div class="qty-group"><label>Grab Bar Finish Upgrade ($124 ea)</label><input type="number" class="finish-upgrade-qty" value="0" min="0" oninput="calculate()"></div>
+            <div class="checkbox-group"><label>Interior Outlet ($396)</label><input type="checkbox" class="addon-cb" value="396" onchange="calculate()"></div>
+            <div class="checkbox-group"><label>Low Voltage 8' Cord Add-on ($175)</label><input type="checkbox" class="addon-cb" value="175" onchange="calculate()"></div>
+        </div>
+
+        <div class="cat-helix category-group hidden">
+            <div class="warning">⚠️ Helix Lifts ALWAYS require a 25% minimum deposit.</div>
+            <label>Select Base Lift:</label>
+            <select class="base-lift" onchange="calculate()">
+                <option value="0">-- Select --</option>
+                <option value="29769">CSL500 Helix (All turns, up to 24') - $29,769</option>
+                <option value="21698">CSL580-18 Helix (18', 1x180° turn) - $21,698</option>
+                <option value="24281">CSL580-24 Helix (24', 1x180° turn) - $24,281</option>
+                <option value="20982">CSL590-18 Helix (18', 1x90° turn) - $20,982</option>
+                <option value="23565">CSL590-24 Helix (24', 1x90° turn) - $23,565</option>
+                <option value="34710">CSL-570 Sweeping Curve (up to 24') - $34,710</option>
+            </select>
+
+            <label>Hardware Add-ons:</label>
+            <div class="qty-group"><label>Linear Ft Rail Add-on above 24' ($454/ft)</label><input type="number" class="helix-rail-ft" value="0" min="0" oninput="calculate()"></div>
+            <div class="qty-group"><label>Custom Park 90° or 180° ($6,250 ea)</label><input type="number" class="helix-park-qty" value="0" min="0" oninput="calculate()"></div>
+            <div class="checkbox-group"><label>Add-on Charging Station for Mid Landing ($1,450)</label><input type="checkbox" class="addon-cb" value="1450" onchange="calculate()"></div>
+        </div>
+
+        <div class="cat-uplift category-group hidden">
+            <div class="warning">⚠️ Uplift maximum weight capacity is 250 lbs.</div>
+            <label>Select Base Lift:</label>
+            <select class="base-lift" onchange="calculate()">
+                <option value="0">-- Select --</option>
+                <option value="29769">Uplift 360 Degree Pkg (27' incl) - $29,769</option>
+                <option value="23565">Uplift 180 Degree Pkg (24' incl) - $23,565</option>
+            </select>
+
+            <label>Hardware Add-ons:</label>
+            <div class="qty-group"><label>Additional Linear Footage ($250/ft)</label><input type="number" class="uplift-rail-ft" value="0" min="0" oninput="calculate()"></div>
+            <div class="qty-group"><label>Add 180° Park or Turn ($6,250 ea)</label><input type="number" class="uplift-180-qty" value="0" min="0" oninput="calculate()"></div>
+            <div class="qty-group"><label>Add 90° Park or Turn ($3,125 ea)</label><input type="number" class="uplift-90-qty" value="0" min="0" oninput="calculate()"></div>
+            <div class="checkbox-group"><label>Uplift Folding Rail Add-on ($3,350)</label><input type="checkbox" class="addon-cb" value="3350" onchange="calculate()"></div>
+            <div class="checkbox-group"><label>Add-on Charging Station for Mid Landing ($1,450)</label><input type="checkbox" class="addon-cb" value="1450" onchange="calculate()"></div>
+        </div>
+
+        <div class="cat-outdoor category-group hidden">
+            <label>Select Base Lift:</label>
+            <select class="base-lift" onchange="calculate()">
+                <option value="0">-- Select --</option>
+                <option value="15681">Outdoor Comfort Lift (Up to 16' max) - $15,681</option>
+                <option value="18047">Outdoor Comfort Lift (16'1" to 24' max) - $18,047</option>
+            </select>
+
+            <label>Hardware & Labor Add-ons:</label>
+            <div class="qty-group"><label>Burial Charge for Elec. Lines ($370 per 20ft)</label><input type="number" class="burial-qty" value="0" min="0" oninput="calculate()"></div>
+            <div class="qty-group"><label>Additional Labor ($95/hour)</label><input type="number" class="labor-qty" value="0" min="0" oninput="calculate()"></div>
+            <div class="checkbox-group"><label>Add Outdoor Outlet ($625)</label><input type="checkbox" class="addon-cb" value="625" onchange="calculate()"></div>
+        </div>
+
+        <div class="universal-addons category-group hidden" style="margin-top: 20px; border-top: 2px solid #ccc; padding-top: 15px;">
+            <div class="checkbox-group"><label><strong>Remove Existing Lift & Dispose ($389)</strong></label><input type="checkbox" class="universal-removal" value="389" onchange="calculate()"></div>
+        </div>
+
+        <div class="per-lift-pricing">
+            <h3 style="margin-top: 0; color: #34495e;">Pricing Adjustments for THIS Lift</h3>
+            <label>Show Price Add-on (%):</label>
+            <input type="number" class="fluff-percent" value="0" min="0" max="100" oninput="calculate()" placeholder="e.g., 10">
+
+            <label>Customer Discount (Off Retail Base %):</label>
+            <input type="number" class="discount-percent" value="0" min="0" max="40" oninput="calculate()" placeholder="e.g., 15">
+        </div>
+    </div>
+</template>
+
 <script>
+    let liftCounter = 0;
+
     // LOGIN LOGIC
     function checkLogin() {
         const user = document.getElementById('usernameInput').value;
@@ -281,39 +298,63 @@
         if (user === 'LHSSREP' && pass === 'Leafhome2026!') {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
+            if (liftCounter === 0) addLift(); // Initialize first lift on successful login
         } else {
             errorMsg.style.display = 'block';
         }
     }
 
-    // APP LOGIC
-    function updateCategory() {
-        const cat = document.getElementById('liftCategory').value;
+    // MULTI-LIFT LOGIC
+    function addLift() {
+        liftCounter++;
+        const template = document.getElementById('lift-template');
+        const clone = template.content.cloneNode(true);
         
-        // Hide all build sections
-        document.querySelectorAll('.category-group').forEach(el => el.classList.add('hidden'));
-        document.getElementById('buildSection').classList.add('hidden');
+        clone.querySelector('.lift-title').innerText = "LIFT " + liftCounter;
         
-        // Reset inputs
-        document.querySelectorAll('.base-lift, .straight-rail').forEach(el => el.value = "0");
-        document.querySelectorAll('input[type="number"]:not(#showPricePercent):not(#discountPercent)').forEach(el => el.value = "0");
-        document.getElementById('downPaymentFlat').value = "";
-        document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
-        document.getElementById('financePlan').value = "-1";
+        document.getElementById('lifts-container').appendChild(clone);
+        updateLiftUI();
+        calculate();
+    }
+
+    function removeLift(btn) {
+        btn.closest('.lift-block').remove();
+        updateLiftUI();
+        calculate();
+    }
+
+    function updateLiftUI() {
+        const blocks = document.querySelectorAll('#lifts-container .lift-block');
+        liftCounter = blocks.length;
         
-        // Show selected section
-        if (cat !== 'none') {
-            document.getElementById('buildSection').classList.remove('hidden');
-            document.getElementById('cat-' + cat).classList.remove('hidden');
-            document.getElementById('universal-addons').classList.remove('hidden');
-            
-            // Auto-set down payment requirements
-            const dpSelect = document.getElementById('downPaymentPercent');
-            if (cat === 'helix') {
-                dpSelect.value = "0.25";
+        blocks.forEach((block, index) => {
+            block.querySelector('.lift-title').innerText = "LIFT " + (index + 1);
+            const removeBtn = block.querySelector('.remove-btn');
+            // Hide remove button if it's the only lift on screen
+            if (blocks.length === 1) {
+                removeBtn.style.display = 'none';
             } else {
-                dpSelect.value = "0.10";
+                removeBtn.style.display = 'block';
             }
+        });
+    }
+
+    function updateCategory(selectElement) {
+        const block = selectElement.closest('.lift-block');
+        const cat = selectElement.value;
+        
+        // Hide all build sections inside this specific lift block
+        block.querySelectorAll('.category-group').forEach(el => el.classList.add('hidden'));
+        
+        // Reset inputs inside this block
+        block.querySelectorAll('.base-lift, .straight-rail').forEach(el => el.value = "0");
+        block.querySelectorAll('input[type="number"]:not(.fluff-percent):not(.discount-percent)').forEach(el => el.value = "0");
+        block.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+        
+        // Show selected section inside this block
+        if (cat !== 'none') {
+            block.querySelector('.cat-' + cat).classList.remove('hidden');
+            block.querySelector('.universal-addons').classList.remove('hidden');
         }
     }
 
@@ -330,85 +371,106 @@
     }
 
     function calculate() {
-        const cat = document.getElementById('liftCategory').value;
-        if (cat === 'none') return;
+        let grandRetailBase = 0;
+        let grandShowBase = 0;
+        let grandFinalBase = 0;
+        let masterCommission = 0;
+        
+        let hasHelix = false;
+        let hasUplift = false;
 
-        const adminFee = 500;
-        const activeContainer = document.getElementById('cat-' + cat);
-        
-        // Get Base Lift Price
-        let retailBase = parseFloat(activeContainer.querySelector('.base-lift').value) || 0;
-        
-        // Add Checkboxes
-        activeContainer.querySelectorAll('.addon-cb:checked').forEach(cb => {
-            retailBase += parseFloat(cb.value);
+        // Loop through every single lift on the screen
+        document.querySelectorAll('#lifts-container .lift-block').forEach(block => {
+            const cat = block.querySelector('.lift-category').value;
+            if (cat === 'none') return;
+
+            let liftRetailBase = 0;
+            const activeContainer = block.querySelector('.cat-' + cat);
+
+            // Get base price for this lift
+            liftRetailBase += parseFloat(activeContainer.querySelector('.base-lift').value) || 0;
+            
+            // Add checkboxes for this lift
+            activeContainer.querySelectorAll('.addon-cb:checked').forEach(cb => {
+                liftRetailBase += parseFloat(cb.value);
+            });
+            
+            // Add Universal Removal if checked for this lift
+            if (block.querySelector('.universal-removal').checked) liftRetailBase += 389;
+
+            // Add Category-Specific Multipliers
+            if (cat === 'straight') {
+                liftRetailBase += parseFloat(activeContainer.querySelector('.straight-rail').value) || 0;
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.grab-bar-qty').value) || 0) * 350;
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.finish-upgrade-qty').value) || 0) * 124;
+            } 
+            else if (cat === 'helix') {
+                hasHelix = true;
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.helix-rail-ft').value) || 0) * 454;
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.helix-park-qty').value) || 0) * 6250;
+            }
+            else if (cat === 'uplift') {
+                hasUplift = true;
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.uplift-rail-ft').value) || 0) * 250;
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.uplift-180-qty').value) || 0) * 6250;
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.uplift-90-qty').value) || 0) * 3125;
+            }
+            else if (cat === 'outdoor') {
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.burial-qty').value) || 0) * 370;
+                liftRetailBase += (parseFloat(activeContainer.querySelector('.labor-qty').value) || 0) * 95;
+            }
+
+            // Get Modifiers for THIS specific lift
+            let showPriceMult = (parseFloat(block.querySelector('.fluff-percent').value) || 0) / 100;
+            let discount = (parseFloat(block.querySelector('.discount-percent').value) || 0) / 100;
+
+            // Price Adjustments for THIS lift
+            let liftShowPrice = liftRetailBase * (1 + showPriceMult);
+            let liftFinalPrice = liftRetailBase * (1 - discount);
+
+            // Commission Calculation for THIS lift
+            let liftCommission = 0;
+            if (liftRetailBase > 0) {
+                if (discount <= 0.10) liftCommission = liftFinalPrice * 0.12; 
+                else if (discount <= 0.15) liftCommission = liftFinalPrice * 0.10;
+                else if (discount <= 0.20) liftCommission = liftFinalPrice * 0.08;
+                else if (discount <= 0.25) liftCommission = liftFinalPrice * 0.05;
+                else if (discount <= 0.40) liftCommission = 200; // Flat payout
+                else liftCommission = 0; // Exceeded max discount
+            }
+
+            // Add to Grand Totals
+            grandRetailBase += liftRetailBase;
+            grandShowBase += liftShowPrice;
+            grandFinalBase += liftFinalPrice;
+            masterCommission += liftCommission;
         });
+
+        // ----------------- GLOBAL MATH ----------------- //
         
-        // Add Universal Removal if checked
-        if (document.getElementById('universal-removal').checked) {
-            retailBase += 389;
-        }
-
-        // Add Category-Specific Multipliers
-        if (cat === 'straight') {
-            retailBase += parseFloat(activeContainer.querySelector('.straight-rail').value) || 0;
-            retailBase += (parseFloat(activeContainer.querySelector('.grab-bar-qty').value) || 0) * 350;
-            retailBase += (parseFloat(activeContainer.querySelector('.finish-upgrade-qty').value) || 0) * 124;
-        } 
-        else if (cat === 'helix') {
-            retailBase += (parseFloat(activeContainer.querySelector('.helix-rail-ft').value) || 0) * 454;
-            retailBase += (parseFloat(activeContainer.querySelector('.helix-park-qty').value) || 0) * 6250;
-        }
-        else if (cat === 'uplift') {
-            retailBase += (parseFloat(activeContainer.querySelector('.uplift-rail-ft').value) || 0) * 250;
-            retailBase += (parseFloat(activeContainer.querySelector('.uplift-180-qty').value) || 0) * 6250;
-            retailBase += (parseFloat(activeContainer.querySelector('.uplift-90-qty').value) || 0) * 3125;
-        }
-        else if (cat === 'outdoor') {
-            retailBase += (parseFloat(activeContainer.querySelector('.burial-qty').value) || 0) * 370;
-            retailBase += (parseFloat(activeContainer.querySelector('.labor-qty').value) || 0) * 95;
-        }
-
-        // Modifiers 
-        let showPriceInput = parseFloat(document.getElementById('showPricePercent').value) || 0;
-        let discountInput = parseFloat(document.getElementById('discountPercent').value) || 0;
+        // $500 Admin Fee is applied ONCE per contract if any lifts are quoted
+        const globalAdminFee = grandRetailBase > 0 ? 500 : 0;
         
-        let showPriceMult = showPriceInput / 100;
-        let discount = discountInput / 100;
+        let totalShowPrice = grandShowBase + globalAdminFee;
+        let totalRetailPrice = grandRetailBase + globalAdminFee;
+        let totalFinalPrice = grandFinalBase + globalAdminFee;
 
-        // Pricing Math
-        let showPrice = retailBase === 0 ? 0 : (retailBase * (1 + showPriceMult)) + adminFee;
-        let retailPrice = retailBase === 0 ? 0 : retailBase + adminFee;
-        let finalPrice = retailBase === 0 ? 0 : (retailBase * (1 - discount)) + adminFee;
-
-        // Commission Logic
-        let commission = 0;
-        let commText = "";
-        if (retailBase > 0) {
-            if (discount <= 0.10) { commission = retailBase * (1 - discount) * 0.12; commText = " (12% Max)"; }
-            else if (discount <= 0.15) { commission = retailBase * (1 - discount) * 0.10; commText = " (10%)"; }
-            else if (discount <= 0.20) { commission = retailBase * (1 - discount) * 0.08; commText = " (8%)"; }
-            else if (discount <= 0.25) { commission = retailBase * (1 - discount) * 0.05; commText = " (5% PAR)"; }
-            else if (discount <= 0.40) { commission = 200; commText = " (Flat Payout)"; }
-            else { commission = 0; commText = " (Max discount exceeded)"; }
+        // Auto-set down payment requirements based on entire order
+        const dpSelect = document.getElementById('downPaymentPercent');
+        if (hasHelix) {
+            dpSelect.value = "0.25";
         }
 
         // Down Payment Math
-        let dpPercent = parseFloat(document.getElementById('downPaymentPercent').value);
+        let dpPercent = parseFloat(dpSelect.value);
         let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
-        let amountDue = 0;
+        let amountDue = dpFlat > 0 ? dpFlat : (totalFinalPrice * dpPercent);
         
-        if (dpFlat > 0) {
-            amountDue = dpFlat;
-        } else {
-            amountDue = finalPrice * dpPercent;
-        }
-        
-        if (cat === 'uplift' && dpFlat === 0 && amountDue > 0 && amountDue < 1000) {
+        if (hasUplift && dpFlat === 0 && amountDue > 0 && amountDue < 1000) {
             amountDue = 1000;
         }
 
-        let balance = retailBase === 0 ? 0 : finalPrice - amountDue;
+        let balance = grandRetailBase === 0 ? 0 : totalFinalPrice - amountDue;
         if (balance < 0) balance = 0; 
 
         // Comprehensive Finance Math (Passing fee to customer)
@@ -425,26 +487,26 @@
         // Display Formatting
         const formatMoney = (num) => '$' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
-        document.getElementById('displayShowPrice').innerText = formatMoney(showPrice);
-        document.getElementById('displayRetailPrice').innerText = formatMoney(retailPrice);
-        document.getElementById('displayFinalPrice').innerText = formatMoney(finalPrice);
-        document.getElementById('displayDue').innerText = formatMoney(amountDue);
-        document.getElementById('displayBalance').innerText = formatMoney(balance);
-        document.getElementById('displayCommission').innerText = retailBase > 0 ? formatMoney(commission) + commText : "$0.00";
+        document.getElementById('displayShowPrice').innerText = grandRetailBase > 0 ? formatMoney(totalShowPrice) : "$0.00";
+        document.getElementById('displayRetailPrice').innerText = grandRetailBase > 0 ? formatMoney(totalRetailPrice) : "$0.00";
+        document.getElementById('displayFinalPrice').innerText = grandRetailBase > 0 ? formatMoney(totalFinalPrice) : "$0.00";
+        document.getElementById('displayDue').innerText = grandRetailBase > 0 ? formatMoney(amountDue) : "$0.00";
+        document.getElementById('displayBalance').innerText = grandRetailBase > 0 ? formatMoney(balance) : "$0.00";
+        document.getElementById('displayCommission').innerText = grandRetailBase > 0 ? formatMoney(masterCommission) : "$0.00";
         
         // Populate Finance Display breakdown
         document.getElementById('displayBaseBalance').innerText = formatMoney(balance);
         document.getElementById('displayFinanceFee').innerText = formatMoney(financeFeeAmount);
         document.getElementById('displayTotalFinanced').innerText = formatMoney(totalFinancedAmount);
         
-        // Handle Monthly Payment display logic based on selection
+        // Handle Monthly Payment display logic
         if (financeSelect.value === "-1") {
             document.getElementById('displayMonthly').innerText = "$0.00";
-        } else if (retailBase > 0 && pfRate > 0) {
+        } else if (grandRetailBase > 0 && pfRate > 0) {
             document.getElementById('displayMonthly').innerText = formatMoney(monthly) + " /mo";
-        } else if (retailBase > 0 && pfRate === 0 && selectedOption.innerText.includes("SAC")) {
+        } else if (grandRetailBase > 0 && pfRate === 0 && selectedOption.innerText.includes("SAC")) {
             document.getElementById('displayMonthly').innerText = "$0.00 /mo (During Promo)";
-        } else if (retailBase > 0 && pfRate === 0) {
+        } else if (grandRetailBase > 0 && pfRate === 0) {
             document.getElementById('displayMonthly').innerText = "$0.00 /mo";
         }
     }
