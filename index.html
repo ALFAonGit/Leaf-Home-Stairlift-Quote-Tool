@@ -86,10 +86,11 @@
         </div>
 
         <div class="section totals-box">
-            <h2>Grand Totals Presentation</h2>
-            <div class="result-row"><span>SHOW PRICE (Initial Offer):</span> <span id="displayShowPrice">$0.00</span></div>
-            <div class="result-row"><span>RETAIL PRICE (Add-ons Removed):</span> <span id="displayRetailPrice">$0.00</span></div>
-            <div class="result-row" style="font-weight: bold; color: #c0392b;"><span>FINAL CLOSING PRICE:</span> <span id="displayFinalPrice">$0.00</span></div>
+            <h2>Price Breakdown</h2>
+            <div class="result-row"><span>SHOW PRICE:</span> <span id="displayShowPrice">$0.00</span></div>
+            <div class="result-row"><span>RETAIL PRICE (Initial offer):</span> <span id="displayRetailPrice">$0.00</span></div>
+            <div class="result-row" style="color: #27ae60;"><span>DISCOUNT (<span id="displayDiscountPercent">0%</span>):</span> <span id="displayDiscountAmount">-$0.00</span></div>
+            <div class="result-row" style="font-weight: bold; color: #c0392b;"><span>FINAL TOTAL PRICE:</span> <span id="displayFinalPrice">$0.00</span></div>
             <div style="font-size: 12px; color: #7f8c8d; text-align: right; margin-top: -5px; margin-bottom: 10px;">*Includes standard $500 Contract Admin Fee</div>
             
             <hr>
@@ -472,6 +473,10 @@
 
         let balance = grandRetailBase === 0 ? 0 : totalFinalPrice - amountDue;
         if (balance < 0) balance = 0; 
+        
+        // Discount Math
+        let totalDiscountAmount = grandRetailBase - grandFinalBase;
+        let effectiveDiscountPercent = grandRetailBase > 0 ? (totalDiscountAmount / grandRetailBase) * 100 : 0;
 
         // Comprehensive Finance Math (Passing fee to customer)
         let financeSelect = document.getElementById('financePlan');
@@ -489,7 +494,10 @@
         
         document.getElementById('displayShowPrice').innerText = grandRetailBase > 0 ? formatMoney(totalShowPrice) : "$0.00";
         document.getElementById('displayRetailPrice').innerText = grandRetailBase > 0 ? formatMoney(totalRetailPrice) : "$0.00";
+        document.getElementById('displayDiscountPercent').innerText = grandRetailBase > 0 ? parseFloat(effectiveDiscountPercent.toFixed(1)) + "%" : "0%";
+        document.getElementById('displayDiscountAmount').innerText = grandRetailBase > 0 ? "-" + formatMoney(totalDiscountAmount) : "-$0.00";
         document.getElementById('displayFinalPrice').innerText = grandRetailBase > 0 ? formatMoney(totalFinalPrice) : "$0.00";
+        
         document.getElementById('displayDue').innerText = grandRetailBase > 0 ? formatMoney(amountDue) : "$0.00";
         document.getElementById('displayBalance').innerText = grandRetailBase > 0 ? formatMoney(balance) : "$0.00";
         document.getElementById('displayCommission').innerText = grandRetailBase > 0 ? formatMoney(masterCommission) : "$0.00";
