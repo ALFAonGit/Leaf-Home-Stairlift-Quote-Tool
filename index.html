@@ -3,48 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaf Stairlift Quoter</title>
+    <title>Stairlift Sales Tool</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
         
         /* LOGIN SCREEN STYLES */
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0d2a1a; display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .login-card { background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .logo-text { font-size: 32px; font-weight: bold; color: #0d2a1a; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .logo-text span { color: #4CAF50; }
-        .confidential-warning { color: #c0392b; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 25px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 10px 0; }
-        .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
-        .login-btn { width: 100%; background-color: #4CAF50; color: white; border: none; padding: 14px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.3s; }
-        .login-btn:hover { background-color: #45a049; }
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #1e272e; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-card { background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        .logo-text { font-size: 34px; font-weight: 800; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; letter-spacing: -1px; }
+        .logo-icon { font-size: 38px; margin-right: 12px; }
+        .logo-text .dark { color: #2c3e50; }
+        .logo-text .blue { color: #3498db; }
+        .confidential-warning { color: #c0392b; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 25px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 12px 0; letter-spacing: 0.5px; }
+        .login-card input { width: 100%; padding: 14px; margin-bottom: 15px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
+        .login-card input:focus { border-color: #3498db; outline: none; }
+        .login-btn { width: 100%; background-color: #3498db; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3); }
+        .login-btn:hover { background-color: #2980b9; }
         
         /* MAIN APP STYLES */
         #mainApp { display: none; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1, h2, h3 { color: #0d2a1a; margin-top: 0; }
-        .section { margin-bottom: 25px; padding: 15px; background: #fafafa; border: 1px solid #ddd; border-radius: 8px; }
-        .lift-block { border: 2px solid #2c3e50; background: #ffffff; position: relative; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
-        .remove-btn { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .add-lift-btn { background-color: #2980b9; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        select, input[type="number"] { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
-        .checkbox-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 5px 0; border-bottom: 1px solid #eee; }
-        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; margin-right: 15px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        h1, h2, h3 { color: #2c3e50; margin-top: 0; }
+        .section { margin-bottom: 25px; padding: 20px; background: #fdfefe; border: 1px solid #e1e8ed; border-radius: 8px; }
+        .lift-block { border: 2px solid #34495e; background: #ffffff; position: relative; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .remove-btn { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .add-lift-btn { background-color: #2c3e50; color: white; border: none; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
+        .add-lift-btn:hover { background-color: #1a252f; }
+        label { display: block; margin-top: 12px; font-weight: 600; color: #34495e; }
+        select, input[type="number"] { width: 100%; padding: 12px; margin-top: 6px; border-radius: 6px; border: 1px solid #ccd1d9; font-size: 16px; box-sizing: border-box; background-color: #f8f9fa; }
+        .checkbox-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 8px 0; border-bottom: 1px solid #f1f2f6; }
+        .checkbox-group input[type="checkbox"] { width: 22px; height: 22px; margin-right: 15px; }
         .checkbox-group label { margin: 0; font-weight: normal; flex-grow: 1; }
-        .qty-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 5px 0; border-bottom: 1px solid #eee; }
+        .qty-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 8px 0; border-bottom: 1px solid #f1f2f6; }
         .qty-group label { margin: 0; font-weight: normal; flex-grow: 1; }
-        .qty-group input[type="number"] { width: 80px; text-align: center; margin: 0; padding: 5px; }
-        .totals-box { background: #e8f4f8; padding: 15px; border-radius: 8px; border-left: 5px solid #3498db; margin-top: 20px; }
+        .qty-group input[type="number"] { width: 80px; text-align: center; margin: 0; padding: 8px; }
+        .totals-box { background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 5px solid #3498db; margin-top: 25px; }
         .totals-box h2 { margin-top: 0; color: #2980b9; }
-        .result-row { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
+        .result-row { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 12px; border-bottom: 1px dashed #bdc3c7; padding-bottom: 8px; }
         .commission { font-weight: bold; color: #27ae60; font-size: 20px; }
-        .finance-box { background: #fdfae6; border-left: 5px solid #f1c40f; }
+        .finance-box { background: #fef9e7; border-left: 5px solid #f1c40f; }
         .rep-box { background: #ecf0f1; border: 1px solid #bdc3c7; margin-top: 40px; }
-        hr { border: 0; height: 1px; background: #ddd; margin: 20px 0; }
+        hr { border: 0; height: 1px; background: #dcdde1; margin: 20px 0; }
         .hidden { display: none !important; }
         .warning { color: #c0392b; font-size: 14px; margin-top: 5px; font-weight: bold; }
-        .toggle-btn { background-color: #34495e; color: white; border: none; padding: 10px 15px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; }
-        .sub-text { font-size: 14px; color: #555; border-bottom: none; margin-bottom: 2px; padding-bottom: 0; }
-        .per-lift-pricing { background: #eef2f5; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #d5dce3; }
+        .toggle-btn { background-color: #7f8c8d; color: white; border: none; padding: 12px 15px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .sub-text { font-size: 14px; color: #555; border-bottom: none; margin-bottom: 4px; padding-bottom: 0; }
+        .per-lift-pricing { background: #e8eaed; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #d5dce3; }
         .breakdown-row { font-size: 15px; color: #2c3e50; display: flex; justify-content: space-between; margin-top: 8px; padding-left: 10px; border-left: 3px solid #2980b9; }
     </style>
 </head>
@@ -52,14 +56,14 @@
 
 <div id="loginScreen">
     <div class="login-card">
-        <div class="logo-text"><span>🍃</span> LeafHome™</div>
-        <p style="margin-top: 0; color: #7f8c8d; font-size: 14px; margin-bottom: 20px;">Safety Solutions Quoter</p>
+        <div class="logo-text"><span class="logo-icon">🛗</span> <span class="dark">Stairlift</span><span class="blue">Sales</span></div>
+        <p style="margin-top: 0; color: #7f8c8d; font-size: 15px; margin-bottom: 25px; font-weight: 500;">Professional Quoting Tool</p>
         
         <div class="confidential-warning">
-            Confidential Pricing Details Belonging To Leaf Home Solutions. All Violators Will Be Subject To Legal Action.
+            Confidential Pricing Details.<br>All Violators Will Be Subject To Legal Action.
         </div>
         
-        <input type="text" id="usernameInput" placeholder="Username">
+        <input type="text" id="usernameInput" placeholder="Rep Username">
         <input type="password" id="passwordInput" placeholder="Password">
         <button class="login-btn" onclick="checkLogin()">SECURE LOGIN</button>
         <p id="loginError" style="color: #c0392b; font-weight: bold; display: none; margin-top: 15px;">Invalid Username or Password</p>
@@ -68,7 +72,10 @@
 
 <div id="mainApp">
     <div class="container">
-        <h1 style="text-align: center; border-bottom: 2px solid #0d2a1a; padding-bottom: 10px; margin-bottom: 20px;">Master Quote Builder</h1>
+        <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px;">
+            <h1 style="color: #2c3e50; font-size: 28px; margin-bottom: 5px;">Master Quote Builder</h1>
+            <p style="margin: 0; color: #7f8c8d; font-size: 14px;">Stairlift Sales Tool v2.0</p>
+        </div>
 
         <div id="lifts-container"></div>
         
@@ -105,6 +112,27 @@
             <select id="financePlan" onchange="calculate()">
                 <option value="-1" data-fee="0">-- Select a Plan --</option>
                 
+                <optgroup label="WELLS FARGO: No Interest w/ Reg Payments">
+                    <option value="0.035" data-fee="0.0175">Plan 1148: 6 Mos No Int (3.5% Min Pymt, 1.75% Fee)</option>
+                    <option value="0.035" data-fee="0.0375">Plan 1019: 12 Mos No Int (3.5% Min Pymt, 3.75% Fee)</option>
+                </optgroup>
+
+                <optgroup label="WELLS FARGO: Reduced Rate & Special APR">
+                    <option value="0.02" data-fee="0.0675">Plan 1157: 6.9% APR (2.0% Min Pymt, 6.75% Fee)</option>
+                    <option value="0.035" data-fee="0.0525">Plan 1197: 9.99% APR (3.5% Min Pymt, 5.25% Fee)</option>
+                    <option value="0.0215" data-fee="0.0400">Plan 2225: 12.9% APR (2.15% Min Pymt, 4.00% Fee)</option>
+                    <option value="0.019462" data-fee="0.1100">Plan 3198: 60 Mos @ 5.99% (1.94% PF, 11.00% Fee)</option>
+                    <option value="0.016156" data-fee="0.0495">Plan 1529: 84 Mos @ 8.99% (1.61% PF, 4.95% Fee)</option>
+                </optgroup>
+
+                <optgroup label="WELLS FARGO: 0% Interest Equal Payments">
+                    <option value="0.055555" data-fee="0.0950">Plan 4073: 18 Mos 0% Equal Pymts (9.50% Fee)</option>
+                    <option value="0.041666" data-fee="0.1100">Plan 4079: 24 Mos 0% Equal Pymts (11.00% Fee)</option>
+                    <option value="0.027777" data-fee="0.1300">Plan 4091: 36 Mos 0% Equal Pymts (13.00% Fee)</option>
+                    <option value="0.020833" data-fee="0.1625">Plan 4103: 48 Mos 0% Equal Pymts (16.25% Fee)</option>
+                    <option value="0.016666" data-fee="0.1875">Plan 4115: 60 Mos 0% Equal Pymts (18.75% Fee)</option>
+                </optgroup>
+
                 <optgroup label="SERVICE FINANCE: Deferred Int / Min Pymts">
                     <option value="0.01" data-fee="0.0375">Plan 1006: 6 Mos Def. Int w/ Min Pymt (3.75% Fee)</option>
                     <option value="0.01" data-fee="0.0500">Plan 1012: 12 Mos Def. Int w/ Min Pymt (5.00% Fee)</option>
@@ -159,11 +187,26 @@
                     <option value="0.0212" data-fee="0.0350">Plan 4612: 6 Mos NINP + 60 Mos @ 9.99% (2.12% PF, 3.50% Fee)</option>
                     <option value="0.0132" data-fee="0.0500">Plan 4632: 6 Mos NINP + 120 Mos @ 9.99% (1.32% PF, 5.00% Fee)</option>
                 </optgroup>
+                
+                <optgroup label="SERVICE FINANCE: Buy Deeper Loan Options">
+                    <option value="0.01" data-fee="0.0000">Buy Deeper: 6 Month WPDI-580 FICO @ 11.95% (Standard Fee)</option>
+                    <option value="0.0138" data-fee="0.1200">Buy Deeper: 120 Mos @ 10.99% (1.38% PF, 12.00% Fee)</option>
+                    <option value="0.0171" data-fee="0.1400">Buy Deeper: 84 Mos @ 10.99% (1.71% PF, 14.00% Fee)</option>
+                </optgroup>
 
                 <optgroup label="FOUNDATION FINANCE: Revolving">
                     <option value="0.0200" data-fee="0.0000">Standard Rate: 17.99% (2.00% PF, Free)</option>
                     <option value="0.0150" data-fee="0.0250">Buy-down 10.9-13.5% (1.50% PF, Varies - e.g. 2.5%)</option>
                     <option value="0.0125" data-fee="0.0500">Buy-down 9.9% (1.25% PF, Varies - e.g. 5.0%)</option>
+                </optgroup>
+                
+                <optgroup label="WELLS FARGO: High Minimum ($7,500+) - NOT APPLICABLE">
+                    <option disabled value="0.014187" data-fee="0.0780">Plan 3672: 96 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
+                    <option disabled value="0.013059" data-fee="0.0830">Plan 3667: 108 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
+                    <option disabled value="0.012166" data-fee="0.0880">Plan 3668: 120 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
+                    <option disabled value="0.015228" data-fee="0.0570">Plan 3669: 96 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
+                    <option disabled value="0.014122" data-fee="0.0620">Plan 3670: 108 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
+                    <option disabled value="0.013252" data-fee="0.0670">Plan 3671: 120 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
                 </optgroup>
             </select>
             
@@ -171,13 +214,13 @@
             <div class="result-row sub-text"><span>Finance Fee Added:</span> <span id="displayFinanceFee">$0.00</span></div>
             <div class="result-row sub-text" style="font-weight: bold;"><span>Total Financed Amount:</span> <span id="displayTotalFinanced">$0.00</span></div>
             
-            <div class="result-row" style="margin-top: 15px; font-weight: bold; font-size: 20px;"><span>EST. MONTHLY PAYMENT:</span> <span id="displayMonthly">$0.00</span></div>
+            <div class="result-row" style="margin-top: 15px; font-weight: bold; font-size: 20px; color: #2c3e50;"><span>EST. MONTHLY PAYMENT:</span> <span id="displayMonthly">$0.00</span></div>
         </div>
 
         <div class="section rep-box">
             <button class="toggle-btn" id="toggleCommBtn" onclick="toggleCommission()">For Sales Rep Use ONLY</button>
             <div id="commissionContainer" class="hidden" style="margin-top: 15px;">
-                <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #ccc; padding-bottom: 5px;">Commission Breakdown</h3>
+                <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #bdc3c7; padding-bottom: 5px;">Commission Breakdown</h3>
                 
                 <div class="result-row sub-text"><span>Project Discount %:</span> <span id="displayGlobalRepDiscount" style="font-weight: bold;">0%</span></div>
                 <div class="result-row sub-text"><span>Commission Tier Earned:</span> <span id="displayCommTier" style="font-weight: bold; color: #2980b9;">12% Max Tier</span></div>
@@ -291,7 +334,7 @@
         </div>
 
         <div class="per-lift-pricing">
-            <h3 style="margin-top: 0; color: #34495e;">Pricing Adjustments for THIS Lift</h3>
+            <h3 style="margin-top: 0; color: #2c3e50;">Pricing Adjustments for THIS Lift</h3>
             <label>Show Price Add-on (%):</label>
             <input type="number" class="fluff-percent" value="0" min="0" max="100" oninput="calculate()" placeholder="e.g., 10">
 
