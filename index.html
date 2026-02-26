@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stairlift Smart Tool by ALFA Corp</title>
+    <title>Stairlift Price Calculator by ALFA Corp</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
         
@@ -11,7 +11,7 @@
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #121619; display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .login-card { background: #1e272e; padding: 40px; border-radius: 12px; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 15px 35px rgba(0,0,0,0.8); border: 1px solid #2c3e50; }
         .logo-img { width: 130px; height: 130px; object-fit: cover; border-radius: 50%; margin: 0 auto 15px auto; display: block; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); border: 2px solid #2ecc71; }
-        .logo-text { font-size: 32px; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.5px; color: #ffffff; }
+        .logo-text { font-size: 28px; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.5px; color: #ffffff; }
         .logo-text .blue { color: #2ecc71; }
         .subtitle { color: #95a5a6; font-size: 14px; margin-top: 0; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
         .confidential-warning { color: #e74c3c; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 25px; border-top: 1px solid #2c3e50; border-bottom: 1px solid #2c3e50; padding: 12px 0; letter-spacing: 0.5px; }
@@ -58,7 +58,7 @@
 <div id="loginScreen">
     <div class="login-card">
         <img src="image.WEBP" alt="ALFA Corp Logo" class="logo-img" onerror="this.style.display='none'">
-        <div class="logo-text">Stairlift <span class="blue">Smart</span></div>
+        <div class="logo-text">Stairlift <span class="blue">Price Calculator</span></div>
         <p class="subtitle">by ALFA Corp</p>
         
         <div class="confidential-warning">
@@ -75,7 +75,7 @@
 <div id="mainApp">
     <div class="container">
         <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px;">
-            <h1 style="color: #2c3e50; font-size: 28px; margin-bottom: 5px;">Stairlift Smart Tool</h1>
+            <h1 style="color: #2c3e50; font-size: 28px; margin-bottom: 5px;">Stairlift Price Calculator</h1>
             <p style="margin: 0; color: #7f8c8d; font-size: 14px; font-weight: bold; text-transform: uppercase;">by ALFA Corp</p>
         </div>
 
@@ -298,6 +298,7 @@
             <div class="qty-group"><label>Linear Ft Rail Add-on above 24' ($454/ft)</label><input type="number" class="helix-rail-ft" value="0" min="0" oninput="calculate()"></div>
             <div class="qty-group"><label>Custom Park 90° or 180° ($6,250 ea)</label><input type="number" class="helix-park-qty" value="0" min="0" oninput="calculate()"></div>
             <div class="checkbox-group"><label>Add-on Charging Station for Mid Landing ($1,450)</label><input type="checkbox" class="addon-cb" value="1450" onchange="calculate()"></div>
+            <div class="checkbox-group"><label>Interior Outlet ($396)</label><input type="checkbox" class="addon-cb" value="396" onchange="calculate()"></div>
         </div>
 
         <div class="cat-uplift category-group hidden">
@@ -315,6 +316,7 @@
             <div class="qty-group"><label>Add 90° Park or Turn ($3,125 ea)</label><input type="number" class="uplift-90-qty" value="0" min="0" oninput="calculate()"></div>
             <div class="checkbox-group"><label>Uplift Folding Rail Add-on ($3,350)</label><input type="checkbox" class="addon-cb" value="3350" onchange="calculate()"></div>
             <div class="checkbox-group"><label>Add-on Charging Station for Mid Landing ($1,450)</label><input type="checkbox" class="addon-cb" value="1450" onchange="calculate()"></div>
+            <div class="checkbox-group"><label>Interior Outlet ($396)</label><input type="checkbox" class="addon-cb" value="396" onchange="calculate()"></div>
         </div>
 
         <div class="cat-outdoor category-group hidden">
