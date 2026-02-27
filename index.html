@@ -49,7 +49,6 @@
         .warning { color: #c0392b; font-size: 14px; margin-top: 5px; font-weight: bold; }
         .toggle-btn { background-color: #7f8c8d; color: white; border: none; padding: 12px 15px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
         .sub-text { font-size: 14px; color: #555; border-bottom: none; margin-bottom: 4px; padding-bottom: 0; }
-        .per-lift-pricing { background: #e8eaed; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #d5dce3; }
         .breakdown-row { font-size: 15px; color: #2c3e50; display: flex; justify-content: space-between; margin-top: 8px; padding-left: 10px; border-left: 3px solid #2ecc71; }
     </style>
 </head>
@@ -86,8 +85,11 @@
         <div class="section" style="background: #eef2f5; border-color: #d5dce3;">
             <h2 style="color: #2980b9;">Global Project Adjustments</h2>
             
-            <label style="color: #2c3e50;">Retail Add-On % (Inflates grand total for negotiations):</label>
+            <label style="color: #2c3e50;">Retail Price Modifier (add-on %):</label>
             <input type="number" id="globalFluffPercent" value="0" min="0" max="100" oninput="calculate()" placeholder="e.g., 10">
+
+            <label style="color: #2c3e50; margin-top: 15px;">Project Discount %:</label>
+            <input type="number" id="globalDiscountPercent" value="0" min="0" max="40" oninput="calculate()" placeholder="e.g., 15">
 
             <label style="margin-top: 15px;">Select Payment Method:</label>
             <select id="paymentMethod" onchange="togglePaymentMethod(); calculate()">
@@ -354,12 +356,6 @@
         <div class="universal-addons category-group hidden" style="margin-top: 20px; border-top: 2px solid #ccc; padding-top: 15px;">
             <div class="checkbox-group"><label><strong>Remove Existing Lift & Dispose ($389)</strong></label><input type="checkbox" class="universal-removal" value="389" onchange="calculate()"></div>
         </div>
-
-        <div class="per-lift-pricing">
-            <h3 style="margin-top: 0; color: #2c3e50;">Discount Adjustments for THIS Lift</h3>
-            <label>Customer Discount (Off Retail Base %):</label>
-            <input type="number" class="discount-percent" value="0" min="0" max="40" oninput="calculate()" placeholder="e.g., 15">
-        </div>
     </div>
 </template>
 
@@ -437,7 +433,7 @@
         
         // Reset inputs inside this block
         block.querySelectorAll('.base-lift, .straight-rail').forEach(el => el.value = "0");
-        block.querySelectorAll('input[type="number"]:not(.discount-percent)').forEach(el => el.value = "0");
+        block.querySelectorAll('input[type="number"]').forEach(el => el.value = "0");
         block.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
         
         // Show selected section inside this block
@@ -471,8 +467,9 @@
         // Formatting function
         const formatMoney = (num) => '$' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-        // Get Global Fluff Percentage
+        // Get Global Modifiers
         let globalFluffRate = (parseFloat(document.getElementById('globalFluffPercent').value) || 0) / 100;
+        let globalDiscountRate = (parseFloat(document.getElementById('globalDiscountPercent').value) || 0) / 100;
 
         // Loop 1: Gather all base math for every single lift
         document.querySelectorAll('#lifts-container .lift-block').forEach((block, index) => {
@@ -515,9 +512,8 @@
                 liftRetailBase += (parseFloat(activeContainer.querySelector('.labor-qty').value) || 0) * 95;
             }
 
-            // Price Adjustments for THIS lift (Only discount applies here now)
-            let discount = (parseFloat(block.querySelector('.discount-percent').value) || 0) / 100;
-            let liftFinalPrice = liftRetailBase * (1 - discount);
+            // Price Adjustments for THIS lift applying global discount
+            let liftFinalPrice = liftRetailBase * (1 - globalDiscountRate);
 
             // Save pure commissionable data for Step 2
             liftsData.push({
@@ -547,39 +543,39 @@
         if (paymentMethod === 'cc') paymentFeeRate = 0.03;
         if (paymentMethod === 'amex') paymentFeeRate = 0.05;
 
-        // Calculate actual processing fee dollar amounts
+        // Calculate actual processing fee dollar amounts based on the total discounted cost (including admin fee)
         let paymentFeeAmountFinal = subtotalFinalPrice * paymentFeeRate;
-        let paymentFeeAmountRetail = subtotalRetail * paymentFeeRate; // used for Today's Price math
+        let paymentFeeAmountRetail = subtotalRetail * paymentFeeRate;
 
-        // Final actual cost
+        // Final actual cost and Today's baseline price
         let totalFinalPrice = subtotalFinalPrice + paymentFeeAmountFinal;
-        
-        // Today's Price (Un-fluffed, pre-discount baseline)
         let todaysPrice = subtotalRetail + paymentFeeAmountRetail;
 
         // Discount Math
         let totalDiscountAmount = grandRetailBase - grandFinalBase;
         let effectiveDiscountPercent = grandRetailBase > 0 ? (totalDiscountAmount / grandRetailBase) * 100 : 0;
 
-        // Finance Math (Needed here to inflate the Retail Price accurately if financing is selected)
+        // --- Fluff (Retail Add-On) Logic ---
+        // Simulate Finance Fee for the completely un-discounted price to accurately inflate the "Retail Price"
         let financeSelect = document.getElementById('financePlan');
         let selectedOption = financeSelect.options[financeSelect.selectedIndex];
         let pfRate = parseFloat(selectedOption.value) || 0;
         let dealerFeeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
 
-        // Calculate a simulated finance fee based on Today's un-discounted price to build the Fluffed Retail Price
         let dpPercent = parseFloat(document.getElementById('downPaymentPercent').value) || 0.10;
         if (hasHelix) dpPercent = 0.25;
         let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
         
-        let simulatedDpAmountRetail = dpFlat > 0 ? dpFlat : (todaysPrice * dpPercent);
-        let simulatedBalanceRetail = todaysPrice - simulatedDpAmountRetail;
-        if (simulatedBalanceRetail < 0) simulatedBalanceRetail = 0;
-        let financeFeeAmountRetail = simulatedBalanceRetail * dealerFeeRate;
+        let simulatedDpAmount = dpFlat > 0 ? dpFlat : (todaysPrice * dpPercent);
+        let simulatedBalance = todaysPrice - simulatedDpAmount;
+        if (simulatedBalance < 0) simulatedBalance = 0;
+        
+        let simulatedFinanceFee = (paymentMethod === 'finance') ? (simulatedBalance * dealerFeeRate) : 0;
 
-        // Determine the TRUE total cost to customer on the base level, and apply the global fluff multiplier to it
-        let absoluteTotalCostToday = todaysPrice + (paymentMethod === 'finance' ? financeFeeAmountRetail : 0);
+        // Fluff applies to the absolute maximum total cost of the job (Base + Admin + CC/Finance Fee)
+        let absoluteTotalCostToday = todaysPrice + simulatedFinanceFee;
         let fluffedRetailPrice = absoluteTotalCostToday * (1 + globalFluffRate);
+        // -----------------------------------
 
         // Determine Global Commission Tier based on the overall effective discount
         let tierRate = 0;
@@ -666,7 +662,7 @@
         document.getElementById('displayTotalFinanced').innerText = formatMoney(totalFinancedAmount);
         
         // Handle Monthly Payment display logic
-        if (financeSelect.value === "-1") {
+        if (financeSelect.value === "-1" || paymentMethod !== 'finance') {
             document.getElementById('displayMonthly').innerText = "$0.00";
         } else if (grandRetailBase > 0 && pfRate > 0) {
             document.getElementById('displayMonthly').innerText = formatMoney(monthly) + " /mo";
