@@ -84,8 +84,17 @@
         <button class="add-lift-btn" onclick="addLift()">➕ Add Another Lift</button>
 
         <div class="section">
-            <h2>Contract Down Payment</h2>
-            <label>Required Deposit (%):</label>
+            <h2>Payment & Deposit Details</h2>
+            
+            <label>Select Payment Method:</label>
+            <select id="paymentMethod" onchange="togglePaymentMethod(); calculate()">
+                <option value="check">Check / ACH / Cash (0% Fee)</option>
+                <option value="cc">Standard Credit Card (3% Fee)</option>
+                <option value="amex">American Express (5% Fee)</option>
+                <option value="finance">Financing (Fees vary by plan)</option>
+            </select>
+
+            <label style="margin-top: 15px;">Required Deposit (%):</label>
             <select id="downPaymentPercent" onchange="calculate()">
                 <option value="0.10">10% (Standard)</option>
                 <option value="0.25">25% (Helix Custom Curve / Forced)</option>
@@ -100,6 +109,12 @@
             <div class="result-row"><span>SHOW PRICE:</span> <span id="displayShowPrice">$0.00</span></div>
             <div class="result-row"><span>RETAIL PRICE (Initial offer):</span> <span id="displayRetailPrice">$0.00</span></div>
             <div class="result-row" style="color: #27ae60;"><span>DISCOUNT (<span id="displayDiscountPercent">0%</span>):</span> <span id="displayDiscountAmount">-$0.00</span></div>
+            
+            <div class="result-row" id="processingFeeRow" style="display: none; color: #e67e22;">
+                <span>PROCESSING FEE (<span id="displayFeePercent">0%</span>):</span> 
+                <span id="displayFeeAmount">+$0.00</span>
+            </div>
+
             <div class="result-row" style="font-weight: bold; color: #c0392b;"><span>FINAL TOTAL PRICE:</span> <span id="displayFinalPrice">$0.00</span></div>
             <div style="font-size: 12px; color: #7f8c8d; text-align: right; margin-top: -5px; margin-bottom: 10px;">*Includes standard $500 Contract Admin Fee</div>
             
@@ -108,7 +123,7 @@
             <div class="result-row"><span>REMAINING BALANCE:</span> <span id="displayBalance">$0.00</span></div>
         </div>
 
-        <div class="section totals-box finance-box">
+        <div id="financeSection" class="section totals-box finance-box hidden">
             <h2>Financing Options</h2>
             <label>Select Finance Plan:</label>
             <select id="financePlan" onchange="calculate()">
@@ -366,6 +381,18 @@
         }
     }
 
+    // TOGGLE PAYMENT METHOD (SHOW/HIDE FINANCING)
+    function togglePaymentMethod() {
+        const method = document.getElementById('paymentMethod').value;
+        const financeSection = document.getElementById('financeSection');
+        if (method === 'finance') {
+            financeSection.classList.remove('hidden');
+        } else {
+            financeSection.classList.add('hidden');
+            document.getElementById('financePlan').value = "-1"; // Auto-reset finance dropdown if they switch back to cash/cc
+        }
+    }
+
     // MULTI-LIFT LOGIC
     function addLift() {
         liftCounter++;
@@ -512,9 +539,21 @@
         // $500 Admin Fee is applied ONCE per contract (Strictly excluded from commission base)
         const globalAdminFee = grandRetailBase > 0 ? 500 : 0;
         
+        // Base Subtotals Before Payment Processing Fees
         let totalShowPrice = grandShowBase + globalAdminFee;
         let totalRetailPrice = grandRetailBase + globalAdminFee;
-        let totalFinalPrice = grandFinalBase + globalAdminFee;
+        let subtotalFinalPrice = grandFinalBase + globalAdminFee;
+
+        // Payment Processing Fee Logic
+        let paymentMethod = document.getElementById('paymentMethod').value;
+        let paymentFeeRate = 0;
+        
+        if (paymentMethod === 'cc') paymentFeeRate = 0.03;
+        if (paymentMethod === 'amex') paymentFeeRate = 0.05;
+
+        // Calculate actual processing fee dollar amount and add to the final total
+        let paymentFeeAmount = subtotalFinalPrice * paymentFeeRate;
+        let totalFinalPrice = subtotalFinalPrice + paymentFeeAmount;
 
         // Discount Math
         let totalDiscountAmount = grandRetailBase - grandFinalBase;
@@ -534,7 +573,7 @@
             else { tierRate = 0; tierText = "0% (Max discount exceeded)"; }
         }
 
-        // Loop 2: Calculate Master Commission (Excluding Admin & Finance Fees)
+        // Loop 2: Calculate Master Commission (Excluding Admin & Finance/CC Fees)
         let masterCommission = 0;
         let breakdownHTML = "";
 
@@ -597,8 +636,20 @@
         document.getElementById('displayRetailPrice').innerText = grandRetailBase > 0 ? formatMoney(totalRetailPrice) : "$0.00";
         document.getElementById('displayDiscountPercent').innerText = grandRetailBase > 0 ? parseFloat(effectiveDiscountPercent.toFixed(1)) + "%" : "0%";
         document.getElementById('displayDiscountAmount').innerText = grandRetailBase > 0 ? "-" + formatMoney(totalDiscountAmount) : "-$0.00";
-        document.getElementById('displayFinalPrice').innerText = grandRetailBase > 0 ? formatMoney(totalFinalPrice) : "$0.00";
         
+        // Handle Payment Processing Fee Display
+        const feeRow = document.getElementById('processingFeeRow');
+        if (paymentFeeRate > 0 && grandRetailBase > 0) {
+            feeRow.style.display = 'flex';
+            document.getElementById('displayFeePercent').innerText = (paymentFeeRate * 100) + "%";
+            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(paymentFeeAmount);
+        } else {
+            feeRow.style.display = 'none';
+            document.getElementById('displayFeePercent').innerText = "0%";
+            document.getElementById('displayFeeAmount').innerText = "+$0.00";
+        }
+
+        document.getElementById('displayFinalPrice').innerText = grandRetailBase > 0 ? formatMoney(totalFinalPrice) : "$0.00";
         document.getElementById('displayDue').innerText = grandRetailBase > 0 ? formatMoney(amountDue) : "$0.00";
         document.getElementById('displayBalance').innerText = grandRetailBase > 0 ? formatMoney(balance) : "$0.00";
         
