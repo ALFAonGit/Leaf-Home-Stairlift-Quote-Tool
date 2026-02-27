@@ -38,16 +38,19 @@
         .qty-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 8px 0; border-bottom: 1px solid #f1f2f6; }
         .qty-group label { margin: 0; font-weight: normal; flex-grow: 1; }
         .qty-group input[type="number"] { width: 80px; text-align: center; margin: 0; padding: 8px; }
-        .totals-box { background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 5px solid #2ecc71; margin-top: 25px; }
-        .totals-box h2 { margin-top: 0; color: #2c3e50; }
-        .result-row { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 12px; border-bottom: 1px dashed #bdc3c7; padding-bottom: 8px; }
+        
+        /* PRESENTATION STYLES */
+        .totals-box { background: #ffffff; padding: 25px; border-radius: 12px; border: 2px solid #bdc3c7; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .retail-box { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 6px solid #95a5a6; margin-bottom: 20px; }
+        .today-box { background: #e8f8f5; padding: 20px; border-radius: 8px; border-left: 6px solid #2ecc71; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.15); }
+        .result-row { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 8px; align-items: center; }
         .commission { font-weight: bold; color: #27ae60; font-size: 20px; }
         .rep-box { background: #ecf0f1; border: 1px solid #bdc3c7; margin-top: 40px; }
-        hr { border: 0; height: 1px; background: #dcdde1; margin: 20px 0; }
+        hr { border: 0; height: 1px; background: #dcdde1; margin: 15px 0; }
         .hidden { display: none !important; }
         .warning { color: #c0392b; font-size: 14px; margin-top: 5px; font-weight: bold; }
         .toggle-btn { background-color: #7f8c8d; color: white; border: none; padding: 12px 15px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
-        .sub-text { font-size: 14px; color: #555; border-bottom: none; margin-bottom: 4px; padding-bottom: 0; }
+        .sub-text { font-size: 15px; color: #555; margin-bottom: 6px; }
         .breakdown-row { font-size: 15px; color: #2c3e50; display: flex; justify-content: space-between; margin-top: 8px; padding-left: 10px; border-left: 3px solid #2ecc71; }
     </style>
 </head>
@@ -212,30 +215,54 @@
             <input type="number" id="downPaymentFlat" value="" min="0" oninput="calculate()" placeholder="Enter custom amount">
         </div>
 
-        <div class="section totals-box">
-            <h2>Price Breakdown</h2>
-            <div class="result-row"><span>RETAIL PRICE (Good for 1 year):</span> <span id="displayShowPrice">$0.00</span></div>
-            <div class="result-row"><span>TODAY'S PRICE (Initial Offer):</span> <span id="displayRetailPrice">$0.00</span></div>
-            <div class="result-row" style="color: #27ae60;"><span>DISCOUNT (<span id="displayDiscountPercent">0%</span>):</span> <span id="displayDiscountAmount">-$0.00</span></div>
+        <div class="totals-box">
+            <h2 style="text-align: center; margin-bottom: 20px;">Price Breakdown</h2>
             
-            <div class="result-row" id="processingFeeRow" style="display: none; color: #e67e22;">
-                <span>PROCESSING FEE (<span id="displayFeePercent">0%</span>):</span> 
-                <span id="displayFeeAmount">+$0.00</span>
+            <div class="retail-box">
+                <div style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-transform: uppercase; margin-bottom: 8px;">Retail Price (1 Year)</div>
+                <div class="result-row" style="border-bottom: none; margin-bottom: 0;">
+                    <span>Total Retail Price:</span> <span id="displayRetailTotal" style="font-weight: bold;">$0.00</span>
+                </div>
+                <div class="result-row" id="retailMonthlyRow" style="display: none; border-bottom: none; margin-top: 5px; margin-bottom: 0; color: #34495e;">
+                    <span>Monthly Retail Payment Price:</span> <span id="displayRetailMonthly" style="font-weight: bold;">$0.00 /mo</span>
+                </div>
             </div>
 
-            <div class="result-row" style="font-weight: bold; color: #c0392b; margin-top: 15px;"><span>FINAL TOTAL PRICE:</span> <span id="displayFinalPrice">$0.00</span></div>
-            <div style="font-size: 12px; color: #7f8c8d; text-align: right; margin-top: -5px; margin-bottom: 10px;">*Includes standard $500 Contract Admin Fee</div>
-            
-            <hr>
-            <div class="result-row" style="margin-top: 15px;"><span>AMOUNT DUE TODAY:</span> <span id="displayDue">$0.00</span></div>
-            <div class="result-row"><span>REMAINING BALANCE:</span> <span id="displayBalance">$0.00</span></div>
+            <div class="today-box">
+                <div style="font-size: 13px; font-weight: bold; color: #27ae60; text-transform: uppercase; margin-bottom: 8px;">Today's Offer Price</div>
+                <div class="result-row" style="border-bottom: none; margin-bottom: 0;">
+                    <span>Total Today's Price:</span> <span id="displayTodayTotal" style="font-weight: bold; color: #27ae60; font-size: 22px;">$0.00</span>
+                </div>
+                <div class="result-row" id="todayMonthlyRow" style="display: none; border-bottom: none; margin-top: 8px; margin-bottom: 0; color: #27ae60;">
+                    <span>Today's Monthly Price:</span> <span id="displayTodayMonthly" style="font-weight: bold; font-size: 20px;">$0.00 /mo</span>
+                </div>
+            </div>
 
-            <div id="financeBreakdownContainer" class="hidden" style="margin-top: 20px; padding: 15px; background: #ffffff; border-radius: 8px; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); border-left: 4px solid #f1c40f;">
-                <div class="result-row sub-text" style="color: #7f8c8d;"><span>Base Financed Balance:</span> <span id="displayBaseBalance">$0.00</span></div>
-                <div class="result-row sub-text" style="color: #e67e22;"><span>Finance Dealer Fee Added:</span> <span id="displayFinanceFee">$0.00</span></div>
-                <div class="result-row sub-text" style="font-weight: bold; color: #2c3e50;"><span>Total Financed Amount:</span> <span id="displayTotalFinanced">$0.00</span></div>
+            <div style="margin-top: 20px; font-size: 15px; color: #555;">
+                <div class="result-row sub-text">
+                    <span>Project Discount (<span id="displayDiscountPercent">0%</span>):</span> 
+                    <span id="displayDiscountAmount" style="color: #27ae60;">-$0.00</span>
+                </div>
                 
-                <div class="result-row" style="margin-top: 15px; font-weight: bold; font-size: 20px; color: #2980b9; border-bottom: none; padding-bottom: 0;"><span>EST. MONTHLY PAYMENT:</span> <span id="displayMonthly">$0.00</span></div>
+                <div class="result-row sub-text" id="processingFeeRow" style="display: none; color: #e67e22;">
+                    <span>Processing Fee (<span id="displayFeePercent">0%</span>):</span> 
+                    <span id="displayFeeAmount">+$0.00</span>
+                </div>
+
+                <div class="result-row sub-text" style="font-weight: bold; color: #2c3e50; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                    <span>Amount Due Today (Deposit):</span> 
+                    <span id="displayDue">$0.00</span>
+                </div>
+
+                <div id="financeBreakdownContainer" class="hidden" style="margin-top: 10px;">
+                    <div class="result-row sub-text"><span>Base Financed Balance:</span> <span id="displayBaseBalance">$0.00</span></div>
+                    <div class="result-row sub-text" style="color: #e67e22;"><span>Finance Dealer Fee Added:</span> <span id="displayFinanceFee">$0.00</span></div>
+                    <div class="result-row sub-text" style="font-weight: bold;"><span>Total Financed Amount:</span> <span id="displayTotalFinanced">$0.00</span></div>
+                </div>
+
+                <div style="font-size: 11px; text-align: right; margin-top: 15px; color: #95a5a6;">
+                    *All presented totals include the standard $500 Contract Admin Fee.
+                </div>
             </div>
         </div>
 
@@ -382,14 +409,17 @@
         const method = document.getElementById('paymentMethod').value;
         const financePlanContainer = document.getElementById('financePlanContainer');
         const financeBreakdownContainer = document.getElementById('financeBreakdownContainer');
+        const retailMonthlyRow = document.getElementById('retailMonthlyRow');
+        const todayMonthlyRow = document.getElementById('todayMonthlyRow');
         
         if (method === 'finance') {
             financePlanContainer.classList.remove('hidden');
-            financeBreakdownContainer.classList.remove('hidden');
         } else {
             financePlanContainer.classList.add('hidden');
             financeBreakdownContainer.classList.add('hidden');
-            document.getElementById('financePlan').value = "-1"; // Auto-reset finance dropdown if they switch back to cash/cc
+            retailMonthlyRow.style.display = 'none';
+            todayMonthlyRow.style.display = 'none';
+            document.getElementById('financePlan').value = "-1"; 
         }
     }
 
@@ -419,7 +449,6 @@
         blocks.forEach((block, index) => {
             block.querySelector('.lift-title').innerText = "LIFT " + (index + 1);
             const removeBtn = block.querySelector('.remove-btn');
-            // Hide remove button if it's the only lift on screen
             if (blocks.length === 1) {
                 removeBtn.style.display = 'none';
             } else {
@@ -432,15 +461,12 @@
         const block = selectElement.closest('.lift-block');
         const cat = selectElement.value;
         
-        // Hide all build sections inside this specific lift block
         block.querySelectorAll('.category-group').forEach(el => el.classList.add('hidden'));
         
-        // Reset inputs inside this block
         block.querySelectorAll('.base-lift, .straight-rail').forEach(el => el.value = "0");
         block.querySelectorAll('input[type="number"]').forEach(el => el.value = "0");
         block.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
         
-        // Show selected section inside this block
         if (cat !== 'none') {
             block.querySelector('.cat-' + cat).classList.remove('hidden');
             block.querySelector('.universal-addons').classList.remove('hidden');
@@ -468,7 +494,6 @@
         
         let liftsData = [];
 
-        // Formatting function
         const formatMoney = (num) => '$' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
         // Get Global Modifiers
@@ -483,18 +508,14 @@
             let liftRetailBase = 0;
             const activeContainer = block.querySelector('.cat-' + cat);
 
-            // Get base price for this lift
             liftRetailBase += parseFloat(activeContainer.querySelector('.base-lift').value) || 0;
             
-            // Add checkboxes for this lift
             activeContainer.querySelectorAll('.addon-cb:checked').forEach(cb => {
                 liftRetailBase += parseFloat(cb.value);
             });
             
-            // Add Universal Removal if checked for this lift
             if (block.querySelector('.universal-removal').checked) liftRetailBase += 389;
 
-            // Add Category-Specific Multipliers
             if (cat === 'straight') {
                 liftRetailBase += parseFloat(activeContainer.querySelector('.straight-rail').value) || 0;
                 liftRetailBase += (parseFloat(activeContainer.querySelector('.grab-bar-qty').value) || 0) * 350;
@@ -516,72 +537,83 @@
                 liftRetailBase += (parseFloat(activeContainer.querySelector('.labor-qty').value) || 0) * 95;
             }
 
-            // Price Adjustments for THIS lift applying global discount
+            // Apply global discount for the specific lift's final base
             let liftFinalPrice = liftRetailBase * (1 - globalDiscountRate);
 
-            // Save pure commissionable data for Step 2
             liftsData.push({
                 name: "LIFT " + (index + 1),
                 retail: liftRetailBase,
                 final: liftFinalPrice
             });
 
-            // Add to Grand Totals
             grandRetailBase += liftRetailBase;
             grandFinalBase += liftFinalPrice;
         });
 
-        // ----------------- GLOBAL MATH & COMMISSION ----------------- //
-        
-        // $500 Admin Fee is applied ONCE per contract (Strictly excluded from commission base)
+        // ----------------- GLOBAL MATH ----------------- //
         const globalAdminFee = grandRetailBase > 0 ? 500 : 0;
         
-        // Subtotals Before Payment Processing Fees (Admin Fee is ALWAYS included in Today's Price)
-        let subtotalRetail = grandRetailBase > 0 ? grandRetailBase + globalAdminFee : 0;
-        let subtotalFinalPrice = grandFinalBase > 0 ? grandFinalBase + globalAdminFee : 0;
+        // 1. TODAY'S OFFER (Actual Contract Deal)
+        let todaysSubtotal = grandFinalBase > 0 ? grandFinalBase + globalAdminFee : 0;
 
-        // Payment Processing Fee Logic
         let paymentMethod = document.getElementById('paymentMethod').value;
         let paymentFeeRate = 0;
-        
         if (paymentMethod === 'cc') paymentFeeRate = 0.03;
         if (paymentMethod === 'amex') paymentFeeRate = 0.05;
 
-        // Calculate actual processing fee dollar amounts based on the total discounted cost (including admin fee)
-        let paymentFeeAmountFinal = subtotalFinalPrice * paymentFeeRate;
-        let paymentFeeAmountRetail = subtotalRetail * paymentFeeRate;
-
-        // Final actual cost and Today's baseline price
-        let totalFinalPrice = subtotalFinalPrice + paymentFeeAmountFinal;
-        let todaysPrice = subtotalRetail + paymentFeeAmountRetail;
-
-        // Discount Math
-        let totalDiscountAmount = grandRetailBase - grandFinalBase;
-        let effectiveDiscountPercent = grandRetailBase > 0 ? (totalDiscountAmount / grandRetailBase) * 100 : 0;
-
-        // --- Fluff (Retail Add-On) Logic ---
-        // Simulate Finance Fee for the completely un-discounted price to accurately inflate the "Retail Price"
-        let financeSelect = document.getElementById('financePlan');
-        let selectedOption = financeSelect.options[financeSelect.selectedIndex];
-        let pfRate = parseFloat(selectedOption.value) || 0;
-        let dealerFeeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
+        let todaysPaymentFee = todaysSubtotal * paymentFeeRate;
+        let todaysTotalBeforeFinance = todaysSubtotal + todaysPaymentFee;
 
         let dpPercent = parseFloat(document.getElementById('downPaymentPercent').value) || 0.10;
         if (hasHelix) dpPercent = 0.25;
         let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
         
-        let simulatedDpAmount = dpFlat > 0 ? dpFlat : (todaysPrice * dpPercent);
-        let simulatedBalance = todaysPrice - simulatedDpAmount;
-        if (simulatedBalance < 0) simulatedBalance = 0;
+        let todaysDeposit = dpFlat > 0 ? dpFlat : (todaysTotalBeforeFinance * dpPercent);
+        if (hasUplift && dpFlat === 0 && todaysDeposit > 0 && todaysDeposit < 1000) {
+            todaysDeposit = 1000;
+        }
+
+        let todaysBalance = grandRetailBase === 0 ? 0 : todaysTotalBeforeFinance - todaysDeposit;
+        if (todaysBalance < 0) todaysBalance = 0; 
+
+        let financeSelect = document.getElementById('financePlan');
+        let selectedOption = financeSelect.options[financeSelect.selectedIndex];
+        let pfRate = parseFloat(selectedOption.value) || 0;
+        let dealerFeeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
+
+        let todaysFinanceFee = (paymentMethod === 'finance') ? (todaysBalance * dealerFeeRate) : 0;
+        let todaysTotalFinanced = todaysBalance + todaysFinanceFee;
         
-        let simulatedFinanceFee = (paymentMethod === 'finance') ? (simulatedBalance * dealerFeeRate) : 0;
+        let todaysAbsoluteTotal = grandRetailBase > 0 ? (todaysDeposit + todaysTotalFinanced) : 0;
+        let todaysMonthly = todaysTotalFinanced * pfRate;
 
-        // Fluff applies to the absolute maximum total cost of the job (Base + Admin + CC/Finance Fee)
-        let absoluteTotalCostToday = todaysPrice + simulatedFinanceFee;
-        let fluffedRetailPrice = absoluteTotalCostToday * (1 + globalFluffRate);
-        // -----------------------------------
+        // 2. RETAIL PRICE (1 Year Anchor)
+        let retailSubtotal = grandRetailBase > 0 ? grandRetailBase + globalAdminFee : 0;
+        let retailPaymentFee = retailSubtotal * paymentFeeRate;
+        let retailTotalBeforeFinance = retailSubtotal + retailPaymentFee;
+        
+        let retailDeposit = dpFlat > 0 ? dpFlat : (retailTotalBeforeFinance * dpPercent);
+        if (hasUplift && dpFlat === 0 && retailDeposit > 0 && retailDeposit < 1000) {
+            retailDeposit = 1000;
+        }
+        
+        let retailBalance = retailTotalBeforeFinance - retailDeposit;
+        if (retailBalance < 0) retailBalance = 0;
+        
+        let retailFinanceFee = (paymentMethod === 'finance') ? (retailBalance * dealerFeeRate) : 0;
+        let retailTotalFinanced = retailBalance + retailFinanceFee;
 
-        // Determine Global Commission Tier based on the overall effective discount
+        let retailAbsoluteTotal = grandRetailBase > 0 ? (retailDeposit + retailTotalFinanced) : 0;
+        
+        // Fluff the Retail
+        let fluffedTotalRetail = retailAbsoluteTotal * (1 + globalFluffRate);
+        let fluffedFinancedAmount = retailTotalFinanced * (1 + globalFluffRate);
+        let fluffedMonthlyRetail = fluffedFinancedAmount * pfRate;
+
+        // COMMISSION LOGIC
+        let totalDiscountAmount = grandRetailBase - grandFinalBase;
+        let effectiveDiscountPercent = grandRetailBase > 0 ? (totalDiscountAmount / grandRetailBase) * 100 : 0;
+
         let tierRate = 0;
         let tierText = "";
         let isFlat = false;
@@ -595,7 +627,6 @@
             else { tierRate = 0; tierText = "0% (Max discount exceeded)"; }
         }
 
-        // Loop 2: Calculate Master Commission (Excluding Admin & Finance/CC Fees)
         let masterCommission = 0;
         let breakdownHTML = "";
 
@@ -606,12 +637,9 @@
                 else if (tierRate > 0) liftComm = lift.final * tierRate;
             }
             masterCommission += liftComm;
-
-            // Build visual breakdown row
             breakdownHTML += `<div class="breakdown-row"><span>${lift.name} Payout:</span> <span style="font-weight: bold; color: #27ae60;">${formatMoney(liftComm)}</span></div>`;
         });
 
-        // Update Rep Only UI Elements
         document.getElementById('displayGlobalRepDiscount').innerText = parseFloat(effectiveDiscountPercent.toFixed(1)) + "%";
         document.getElementById('displayCommTier').innerText = tierText;
         document.getElementById('displayCommission').innerText = grandRetailBase > 0 ? formatMoney(masterCommission) : "$0.00";
@@ -623,57 +651,53 @@
         } else {
             breakdownContainer.classList.add('hidden');
         }
-
-        // Actual Final Down Payment Math
-        let amountDue = dpFlat > 0 ? dpFlat : (totalFinalPrice * dpPercent);
-        if (hasUplift && dpFlat === 0 && amountDue > 0 && amountDue < 1000) {
-            amountDue = 1000;
-        }
-
-        let balance = grandRetailBase === 0 ? 0 : totalFinalPrice - amountDue;
-        if (balance < 0) balance = 0; 
-
-        // Actual Final Finance Math
-        let financeFeeAmount = balance * dealerFeeRate;
-        let totalFinancedAmount = balance + financeFeeAmount;
-        let monthly = totalFinancedAmount * pfRate;
         
-        // Update Customer Presentation UI Elements
-        document.getElementById('displayShowPrice').innerText = grandRetailBase > 0 ? formatMoney(fluffedRetailPrice) : "$0.00";
-        document.getElementById('displayRetailPrice').innerText = grandRetailBase > 0 ? formatMoney(todaysPrice) : "$0.00";
+        // CUSTOMER PRESENTATION UI UPDATES
+        document.getElementById('displayRetailTotal').innerText = grandRetailBase > 0 ? formatMoney(fluffedTotalRetail) : "$0.00";
+        document.getElementById('displayTodayTotal').innerText = grandRetailBase > 0 ? formatMoney(todaysAbsoluteTotal) : "$0.00";
+        
         document.getElementById('displayDiscountPercent').innerText = grandRetailBase > 0 ? parseFloat(effectiveDiscountPercent.toFixed(1)) + "%" : "0%";
         document.getElementById('displayDiscountAmount').innerText = grandRetailBase > 0 ? "-" + formatMoney(totalDiscountAmount) : "-$0.00";
         
-        // Handle Payment Processing Fee Display
         const feeRow = document.getElementById('processingFeeRow');
         if (paymentFeeRate > 0 && grandRetailBase > 0) {
             feeRow.style.display = 'flex';
             document.getElementById('displayFeePercent').innerText = (paymentFeeRate * 100) + "%";
-            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(paymentFeeAmountFinal);
+            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(todaysPaymentFee);
         } else {
             feeRow.style.display = 'none';
-            document.getElementById('displayFeePercent').innerText = "0%";
-            document.getElementById('displayFeeAmount').innerText = "+$0.00";
         }
 
-        document.getElementById('displayFinalPrice').innerText = grandRetailBase > 0 ? formatMoney(totalFinalPrice) : "$0.00";
-        document.getElementById('displayDue').innerText = grandRetailBase > 0 ? formatMoney(amountDue) : "$0.00";
-        document.getElementById('displayBalance').innerText = grandRetailBase > 0 ? formatMoney(balance) : "$0.00";
+        document.getElementById('displayDue').innerText = grandRetailBase > 0 ? formatMoney(todaysDeposit) : "$0.00";
         
-        // Populate Finance Display breakdown
-        document.getElementById('displayBaseBalance').innerText = formatMoney(balance);
-        document.getElementById('displayFinanceFee').innerText = formatMoney(financeFeeAmount);
-        document.getElementById('displayTotalFinanced').innerText = formatMoney(totalFinancedAmount);
-        
-        // Handle Monthly Payment display logic
-        if (financeSelect.value === "-1" || paymentMethod !== 'finance') {
-            document.getElementById('displayMonthly').innerText = "$0.00";
-        } else if (grandRetailBase > 0 && pfRate > 0) {
-            document.getElementById('displayMonthly').innerText = formatMoney(monthly) + " /mo";
-        } else if (grandRetailBase > 0 && pfRate === 0 && selectedOption.innerText.includes("SAC")) {
-            document.getElementById('displayMonthly').innerText = "$0.00 /mo (During Promo)";
-        } else if (grandRetailBase > 0 && pfRate === 0) {
-            document.getElementById('displayMonthly').innerText = "$0.00 /mo";
+        // FINANCING UI LOGIC
+        const retailMonthlyRow = document.getElementById('retailMonthlyRow');
+        const todayMonthlyRow = document.getElementById('todayMonthlyRow');
+        const financeBreakdownContainer = document.getElementById('financeBreakdownContainer');
+
+        if (paymentMethod === 'finance' && financeSelect.value !== "-1" && grandRetailBase > 0) {
+            financeBreakdownContainer.classList.remove('hidden');
+            retailMonthlyRow.style.display = 'flex';
+            todayMonthlyRow.style.display = 'flex';
+            
+            document.getElementById('displayBaseBalance').innerText = formatMoney(todaysBalance);
+            document.getElementById('displayFinanceFee').innerText = formatMoney(todaysFinanceFee);
+            document.getElementById('displayTotalFinanced').innerText = formatMoney(todaysTotalFinanced);
+
+            if (pfRate > 0) {
+                document.getElementById('displayRetailMonthly').innerText = formatMoney(fluffedMonthlyRetail) + " /mo";
+                document.getElementById('displayTodayMonthly').innerText = formatMoney(todaysMonthly) + " /mo";
+            } else if (pfRate === 0 && selectedOption.innerText.includes("SAC")) {
+                document.getElementById('displayRetailMonthly').innerText = "$0.00 /mo (During Promo)";
+                document.getElementById('displayTodayMonthly').innerText = "$0.00 /mo (During Promo)";
+            } else {
+                document.getElementById('displayRetailMonthly').innerText = "$0.00 /mo";
+                document.getElementById('displayTodayMonthly').innerText = "$0.00 /mo";
+            }
+        } else {
+            financeBreakdownContainer.classList.add('hidden');
+            retailMonthlyRow.style.display = 'none';
+            todayMonthlyRow.style.display = 'none';
         }
     }
 </script>
