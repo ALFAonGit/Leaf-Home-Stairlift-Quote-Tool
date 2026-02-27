@@ -83,10 +83,13 @@
         
         <button class="add-lift-btn" onclick="addLift()">➕ Add Another Lift</button>
 
-        <div class="section">
-            <h2>Payment & Deposit Details</h2>
+        <div class="section" style="background: #eef2f5; border-color: #d5dce3;">
+            <h2 style="color: #2980b9;">Global Project Adjustments</h2>
             
-            <label>Select Payment Method:</label>
+            <label style="color: #2c3e50;">Retail Add-On % (Inflates grand total for negotiations):</label>
+            <input type="number" id="globalFluffPercent" value="0" min="0" max="100" oninput="calculate()" placeholder="e.g., 10">
+
+            <label style="margin-top: 15px;">Select Payment Method:</label>
             <select id="paymentMethod" onchange="togglePaymentMethod(); calculate()">
                 <option value="check">Check / ACH / Cash (0% Fee)</option>
                 <option value="cc">Standard Credit Card (3% Fee)</option>
@@ -106,8 +109,8 @@
 
         <div class="section totals-box">
             <h2>Price Breakdown</h2>
-            <div class="result-row"><span>SHOW PRICE:</span> <span id="displayShowPrice">$0.00</span></div>
-            <div class="result-row"><span>RETAIL PRICE (Initial offer):</span> <span id="displayRetailPrice">$0.00</span></div>
+            <div class="result-row"><span>RETAIL PRICE (Good for 1 year):</span> <span id="displayShowPrice">$0.00</span></div>
+            <div class="result-row"><span>TODAY'S PRICE (Initial Offer):</span> <span id="displayRetailPrice">$0.00</span></div>
             <div class="result-row" style="color: #27ae60;"><span>DISCOUNT (<span id="displayDiscountPercent">0%</span>):</span> <span id="displayDiscountAmount">-$0.00</span></div>
             
             <div class="result-row" id="processingFeeRow" style="display: none; color: #e67e22;">
@@ -115,7 +118,7 @@
                 <span id="displayFeeAmount">+$0.00</span>
             </div>
 
-            <div class="result-row" style="font-weight: bold; color: #c0392b;"><span>FINAL TOTAL PRICE:</span> <span id="displayFinalPrice">$0.00</span></div>
+            <div class="result-row" style="font-weight: bold; color: #c0392b; margin-top: 15px;"><span>FINAL TOTAL PRICE:</span> <span id="displayFinalPrice">$0.00</span></div>
             <div style="font-size: 12px; color: #7f8c8d; text-align: right; margin-top: -5px; margin-bottom: 10px;">*Includes standard $500 Contract Admin Fee</div>
             
             <hr>
@@ -353,10 +356,7 @@
         </div>
 
         <div class="per-lift-pricing">
-            <h3 style="margin-top: 0; color: #2c3e50;">Pricing Adjustments for THIS Lift</h3>
-            <label>Show Price Add-on (%):</label>
-            <input type="number" class="fluff-percent" value="0" min="0" max="100" oninput="calculate()" placeholder="e.g., 10">
-
+            <h3 style="margin-top: 0; color: #2c3e50;">Discount Adjustments for THIS Lift</h3>
             <label>Customer Discount (Off Retail Base %):</label>
             <input type="number" class="discount-percent" value="0" min="0" max="40" oninput="calculate()" placeholder="e.g., 15">
         </div>
@@ -437,7 +437,7 @@
         
         // Reset inputs inside this block
         block.querySelectorAll('.base-lift, .straight-rail').forEach(el => el.value = "0");
-        block.querySelectorAll('input[type="number"]:not(.fluff-percent):not(.discount-percent)').forEach(el => el.value = "0");
+        block.querySelectorAll('input[type="number"]:not(.discount-percent)').forEach(el => el.value = "0");
         block.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
         
         // Show selected section inside this block
@@ -461,7 +461,6 @@
 
     function calculate() {
         let grandRetailBase = 0;
-        let grandShowBase = 0;
         let grandFinalBase = 0;
         
         let hasHelix = false;
@@ -471,6 +470,9 @@
 
         // Formatting function
         const formatMoney = (num) => '$' + num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        // Get Global Fluff Percentage
+        let globalFluffRate = (parseFloat(document.getElementById('globalFluffPercent').value) || 0) / 100;
 
         // Loop 1: Gather all base math for every single lift
         document.querySelectorAll('#lifts-container .lift-block').forEach((block, index) => {
@@ -513,12 +515,8 @@
                 liftRetailBase += (parseFloat(activeContainer.querySelector('.labor-qty').value) || 0) * 95;
             }
 
-            // Get Modifiers for THIS specific lift
-            let showPriceMult = (parseFloat(block.querySelector('.fluff-percent').value) || 0) / 100;
+            // Price Adjustments for THIS lift (Only discount applies here now)
             let discount = (parseFloat(block.querySelector('.discount-percent').value) || 0) / 100;
-
-            // Price Adjustments for THIS lift
-            let liftShowPrice = liftRetailBase * (1 + showPriceMult);
             let liftFinalPrice = liftRetailBase * (1 - discount);
 
             // Save pure commissionable data for Step 2
@@ -530,7 +528,6 @@
 
             // Add to Grand Totals
             grandRetailBase += liftRetailBase;
-            grandShowBase += liftShowPrice;
             grandFinalBase += liftFinalPrice;
         });
 
@@ -539,10 +536,9 @@
         // $500 Admin Fee is applied ONCE per contract (Strictly excluded from commission base)
         const globalAdminFee = grandRetailBase > 0 ? 500 : 0;
         
-        // Base Subtotals Before Payment Processing Fees
-        let totalShowPrice = grandShowBase + globalAdminFee;
-        let totalRetailPrice = grandRetailBase + globalAdminFee;
-        let subtotalFinalPrice = grandFinalBase + globalAdminFee;
+        // Subtotals Before Payment Processing Fees
+        let subtotalRetail = grandRetailBase > 0 ? grandRetailBase + globalAdminFee : 0;
+        let subtotalFinalPrice = grandFinalBase > 0 ? grandFinalBase + globalAdminFee : 0;
 
         // Payment Processing Fee Logic
         let paymentMethod = document.getElementById('paymentMethod').value;
@@ -551,13 +547,39 @@
         if (paymentMethod === 'cc') paymentFeeRate = 0.03;
         if (paymentMethod === 'amex') paymentFeeRate = 0.05;
 
-        // Calculate actual processing fee dollar amount and add to the final total
-        let paymentFeeAmount = subtotalFinalPrice * paymentFeeRate;
-        let totalFinalPrice = subtotalFinalPrice + paymentFeeAmount;
+        // Calculate actual processing fee dollar amounts
+        let paymentFeeAmountFinal = subtotalFinalPrice * paymentFeeRate;
+        let paymentFeeAmountRetail = subtotalRetail * paymentFeeRate; // used for Today's Price math
+
+        // Final actual cost
+        let totalFinalPrice = subtotalFinalPrice + paymentFeeAmountFinal;
+        
+        // Today's Price (Un-fluffed, pre-discount baseline)
+        let todaysPrice = subtotalRetail + paymentFeeAmountRetail;
 
         // Discount Math
         let totalDiscountAmount = grandRetailBase - grandFinalBase;
         let effectiveDiscountPercent = grandRetailBase > 0 ? (totalDiscountAmount / grandRetailBase) * 100 : 0;
+
+        // Finance Math (Needed here to inflate the Retail Price accurately if financing is selected)
+        let financeSelect = document.getElementById('financePlan');
+        let selectedOption = financeSelect.options[financeSelect.selectedIndex];
+        let pfRate = parseFloat(selectedOption.value) || 0;
+        let dealerFeeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
+
+        // Calculate a simulated finance fee based on Today's un-discounted price to build the Fluffed Retail Price
+        let dpPercent = parseFloat(document.getElementById('downPaymentPercent').value) || 0.10;
+        if (hasHelix) dpPercent = 0.25;
+        let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
+        
+        let simulatedDpAmountRetail = dpFlat > 0 ? dpFlat : (todaysPrice * dpPercent);
+        let simulatedBalanceRetail = todaysPrice - simulatedDpAmountRetail;
+        if (simulatedBalanceRetail < 0) simulatedBalanceRetail = 0;
+        let financeFeeAmountRetail = simulatedBalanceRetail * dealerFeeRate;
+
+        // Determine the TRUE total cost to customer on the base level, and apply the global fluff multiplier to it
+        let absoluteTotalCostToday = todaysPrice + (paymentMethod === 'finance' ? financeFeeAmountRetail : 0);
+        let fluffedRetailPrice = absoluteTotalCostToday * (1 + globalFluffRate);
 
         // Determine Global Commission Tier based on the overall effective discount
         let tierRate = 0;
@@ -602,17 +624,8 @@
             breakdownContainer.classList.add('hidden');
         }
 
-        // Auto-set down payment requirements based on entire order
-        const dpSelect = document.getElementById('downPaymentPercent');
-        if (hasHelix) {
-            dpSelect.value = "0.25";
-        }
-
-        // Down Payment Math
-        let dpPercent = parseFloat(dpSelect.value);
-        let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
+        // Actual Final Down Payment Math
         let amountDue = dpFlat > 0 ? dpFlat : (totalFinalPrice * dpPercent);
-        
         if (hasUplift && dpFlat === 0 && amountDue > 0 && amountDue < 1000) {
             amountDue = 1000;
         }
@@ -620,20 +633,14 @@
         let balance = grandRetailBase === 0 ? 0 : totalFinalPrice - amountDue;
         if (balance < 0) balance = 0; 
 
-        // Comprehensive Finance Math
-        let financeSelect = document.getElementById('financePlan');
-        let selectedOption = financeSelect.options[financeSelect.selectedIndex];
-        
-        let pfRate = parseFloat(selectedOption.value) || 0;
-        let dealerFeeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
-
+        // Actual Final Finance Math
         let financeFeeAmount = balance * dealerFeeRate;
         let totalFinancedAmount = balance + financeFeeAmount;
         let monthly = totalFinancedAmount * pfRate;
         
         // Update Customer Presentation UI Elements
-        document.getElementById('displayShowPrice').innerText = grandRetailBase > 0 ? formatMoney(totalShowPrice) : "$0.00";
-        document.getElementById('displayRetailPrice').innerText = grandRetailBase > 0 ? formatMoney(totalRetailPrice) : "$0.00";
+        document.getElementById('displayShowPrice').innerText = grandRetailBase > 0 ? formatMoney(fluffedRetailPrice) : "$0.00";
+        document.getElementById('displayRetailPrice').innerText = grandRetailBase > 0 ? formatMoney(todaysPrice) : "$0.00";
         document.getElementById('displayDiscountPercent').innerText = grandRetailBase > 0 ? parseFloat(effectiveDiscountPercent.toFixed(1)) + "%" : "0%";
         document.getElementById('displayDiscountAmount').innerText = grandRetailBase > 0 ? "-" + formatMoney(totalDiscountAmount) : "-$0.00";
         
@@ -642,7 +649,7 @@
         if (paymentFeeRate > 0 && grandRetailBase > 0) {
             feeRow.style.display = 'flex';
             document.getElementById('displayFeePercent').innerText = (paymentFeeRate * 100) + "%";
-            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(paymentFeeAmount);
+            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(paymentFeeAmountFinal);
         } else {
             feeRow.style.display = 'none';
             document.getElementById('displayFeePercent').innerText = "0%";
