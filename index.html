@@ -42,7 +42,6 @@
         .totals-box h2 { margin-top: 0; color: #2c3e50; }
         .result-row { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 12px; border-bottom: 1px dashed #bdc3c7; padding-bottom: 8px; }
         .commission { font-weight: bold; color: #27ae60; font-size: 20px; }
-        .finance-box { background: #fef9e7; border-left: 5px solid #f1c40f; }
         .rep-box { background: #ecf0f1; border: 1px solid #bdc3c7; margin-top: 40px; }
         hr { border: 0; height: 1px; background: #dcdde1; margin: 20px 0; }
         .hidden { display: none !important; }
@@ -99,6 +98,110 @@
                 <option value="finance">Financing (Fees vary by plan)</option>
             </select>
 
+            <div id="financePlanContainer" class="hidden" style="margin-top: 15px; padding: 15px; background: #ffffff; border: 1px solid #bdc3c7; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                <label style="color: #c0392b; margin-top: 0;">Select Finance Plan:</label>
+                <select id="financePlan" onchange="calculate()">
+                    <option value="-1" data-fee="0">-- Select a Plan --</option>
+                    
+                    <optgroup label="WELLS FARGO: No Interest w/ Reg Payments">
+                        <option value="0.035" data-fee="0.0175">Plan 1148: 6 Mos No Int (3.5% Min Pymt, 1.75% Fee)</option>
+                        <option value="0.035" data-fee="0.0375">Plan 1019: 12 Mos No Int (3.5% Min Pymt, 3.75% Fee)</option>
+                    </optgroup>
+
+                    <optgroup label="WELLS FARGO: Reduced Rate & Special APR">
+                        <option value="0.02" data-fee="0.0675">Plan 1157: 6.9% APR (2.0% Min Pymt, 6.75% Fee)</option>
+                        <option value="0.035" data-fee="0.0525">Plan 1197: 9.99% APR (3.5% Min Pymt, 5.25% Fee)</option>
+                        <option value="0.0215" data-fee="0.0400">Plan 2225: 12.9% APR (2.15% Min Pymt, 4.00% Fee)</option>
+                        <option value="0.019462" data-fee="0.1100">Plan 3198: 60 Mos @ 5.99% (1.94% PF, 11.00% Fee)</option>
+                        <option value="0.016156" data-fee="0.0495">Plan 1529: 84 Mos @ 8.99% (1.61% PF, 4.95% Fee)</option>
+                    </optgroup>
+
+                    <optgroup label="WELLS FARGO: 0% Interest Equal Payments">
+                        <option value="0.055555" data-fee="0.0950">Plan 4073: 18 Mos 0% Equal Pymts (9.50% Fee)</option>
+                        <option value="0.041666" data-fee="0.1100">Plan 4079: 24 Mos 0% Equal Pymts (11.00% Fee)</option>
+                        <option value="0.027777" data-fee="0.1300">Plan 4091: 36 Mos 0% Equal Pymts (13.00% Fee)</option>
+                        <option value="0.020833" data-fee="0.1625">Plan 4103: 48 Mos 0% Equal Pymts (16.25% Fee)</option>
+                        <option value="0.016666" data-fee="0.1875">Plan 4115: 60 Mos 0% Equal Pymts (18.75% Fee)</option>
+                    </optgroup>
+
+                    <optgroup label="SERVICE FINANCE: Deferred Int / Min Pymts">
+                        <option value="0.01" data-fee="0.0375">Plan 1006: 6 Mos Def. Int w/ Min Pymt (3.75% Fee)</option>
+                        <option value="0.01" data-fee="0.0500">Plan 1012: 12 Mos Def. Int w/ Min Pymt (5.00% Fee)</option>
+                        <option value="0.01" data-fee="0.0550">Plan 1018: 18 Mos Def. Int w/ Min Pymt (5.50% Fee)</option>
+                        <option value="0.01" data-fee="0.0775">Plan 1024: 24 Mos Def. Int w/ Min Pymt (7.75% Fee)</option>
+                    </optgroup>
+                    
+                    <optgroup label="SERVICE FINANCE: Same As Cash (No Pymts)">
+                        <option value="0" data-fee="0.0375">Plan 2003: 3 Mos SAC (3.75% Fee)</option>
+                        <option value="0" data-fee="0.0400">Plan 2006: 6 Mos SAC (4.00% Fee)</option>
+                        <option value="0" data-fee="0.0550">Plan 2012: 12 Mos SAC (5.50% Fee)</option>
+                        <option value="0" data-fee="0.0875">Plan 2018: 18 Mos SAC (8.75% Fee)</option>
+                        <option value="0" data-fee="0.1250">Plan 2024: 24 Mos SAC (12.50% Fee)</option>
+                    </optgroup>
+                    
+                    <optgroup label="SERVICE FINANCE: Equal Monthly Pymts (Zero Int)">
+                        <option value="0.040000" data-fee="0.0925">Plan 3025: 25 Mos Equal Pymts (9.25% Fee)</option>
+                        <option value="0.027777" data-fee="0.1300">Plan 3036: 36 Mos Equal Pymts (13.00% Fee)</option>
+                        <option value="0.020833" data-fee="0.1400">Plan 3048: 48 Mos Equal Pymts (14.00% Fee)</option>
+                        <option value="0.016666" data-fee="0.1500">Plan 3060: 60 Mos Equal Pymts (15.00% Fee)</option>
+                        <option value="0.013888" data-fee="0.1800">Plan 3072: 72 Mos Equal Pymts (18.00% Fee)</option>
+                    </optgroup>
+                    
+                    <optgroup label="SERVICE FINANCE: Reduced Interest Loans">
+                        <option value="0.0082" data-fee="0.2100">Plan 4082: 144 Mos @ 2.99% (0.82% PF, 21.00% Fee)</option>
+                        <option value="0.0092" data-fee="0.0975">Plan 4092: 144 Mos @ 4.99% (0.92% PF, 9.75% Fee)</option>
+                        <option value="0.0071" data-fee="0.1700">Plan 4071: 240 Mos @ 5.99% (0.71% PF, 17.00% Fee)</option>
+                        <option value="0.0198" data-fee="0.0500">Plan 4198: 60 Mos @ 6.99% (1.98% PF, 5.00% Fee)</option>
+                        <option value="0.0116" data-fee="0.0500">Plan 4116: 120 Mos @ 6.99% (1.16% PF, 5.00% Fee)</option>
+                        <option value="0.0102" data-fee="0.0650">Plan 4102: 144 Mos @ 6.99% (1.02% PF, 6.50% Fee)</option>
+                        <option value="0.0089" data-fee="0.0650">Plan 4089: 180 Mos @ 6.99% (0.89% PF, 6.50% Fee)</option>
+                        <option value="0.0202" data-fee="0.0300">Plan 4202: 60 Mos @ 7.99% (2.02% PF, 3.00% Fee)</option>
+                        <option value="0.0121" data-fee="0.0300">Plan 4121: 120 Mos @ 7.99% (1.21% PF, 3.00% Fee)</option>
+                        <option value="0.0108" data-fee="0.0300">Plan 4108: 144 Mos @ 7.99% (1.08% PF, 3.00% Fee)</option>
+                        <option value="0.0096" data-fee="0.0300">Plan 4096: 180 Mos @ 7.99% (0.96% PF, 3.00% Fee)</option>
+                        <option value="0.0212" data-fee="0.0400">Plan 4212: 60 Mos @ 9.99% (2.12% PF, 4.00% Fee)</option>
+                        <option value="0.0165" data-fee="0.0490">Plan 4165: 85 Mos @ 9.99% (1.65% PF, 4.90% Fee)</option>
+                        <option value="0.0158" data-fee="0.0350">Plan 4158: 90 Mos @ 9.99% (1.58% PF, 3.50% Fee)</option>
+                        <option value="0.0150" data-fee="0.0550">Plan 4150: 97 Mos @ 9.99% (1.50% PF, 5.50% Fee)</option>
+                        <option value="0.0132" data-fee="0.0000">Plan 4132: 120 Mos @ 9.99% (1.32% PF, 0% Fee)</option>
+                        <option value="0.0119" data-fee="0.0200">Plan 4119: 144 Mos @ 9.99% (1.19% PF, 2.00% Fee)</option>
+                        <option value="0.0107" data-fee="0.0200">Plan 4107: 180 Mos @ 9.99% (1.07% PF, 2.00% Fee)</option>
+                        <option value="0.0176" data-fee="0.0200">Plan 4011: 84 Mos @ 11.99% (1.76% PF, 2.00% Fee)</option>
+                        <option value="0.0181" data-fee="0.0000">Plan 4012: 84 Mos @ 12.99% (1.81% PF, 0% Fee)</option>
+                    </optgroup>
+
+                    <optgroup label="SERVICE FINANCE: Hybrid Loans (Deferred Pymts)">
+                        <option value="0.0198" data-fee="0.0550">Plan 4398: 3 Mos NINP + 60 Mos @ 6.99% (1.98% PF, 5.50% Fee)</option>
+                        <option value="0.0116" data-fee="0.0550">Plan 4316: 3 Mos NINP + 120 Mos @ 6.99% (1.16% PF, 5.50% Fee)</option>
+                        <option value="0.0212" data-fee="0.0150">Plan 4312: 3 Mos NINP + 60 Mos @ 9.99% (2.12% PF, 1.50% Fee)</option>
+                        <option value="0.0132" data-fee="0.0200">Plan 4332: 3 Mos NINP + 120 Mos @ 9.99% (1.32% PF, 2.00% Fee)</option>
+                        <option value="0.0212" data-fee="0.0350">Plan 4612: 6 Mos NINP + 60 Mos @ 9.99% (2.12% PF, 3.50% Fee)</option>
+                        <option value="0.0132" data-fee="0.0500">Plan 4632: 6 Mos NINP + 120 Mos @ 9.99% (1.32% PF, 5.00% Fee)</option>
+                    </optgroup>
+                    
+                    <optgroup label="SERVICE FINANCE: Buy Deeper Loan Options">
+                        <option value="0.01" data-fee="0.0000">Buy Deeper: 6 Month WPDI-580 FICO @ 11.95% (Standard Fee)</option>
+                        <option value="0.0138" data-fee="0.1200">Buy Deeper: 120 Mos @ 10.99% (1.38% PF, 12.00% Fee)</option>
+                        <option value="0.0171" data-fee="0.1400">Buy Deeper: 84 Mos @ 10.99% (1.71% PF, 14.00% Fee)</option>
+                    </optgroup>
+
+                    <optgroup label="FOUNDATION FINANCE: Revolving">
+                        <option value="0.0200" data-fee="0.0000">Standard Rate: 17.99% (2.00% PF, Free)</option>
+                        <option value="0.0150" data-fee="0.0250">Buy-down 10.9-13.5% (1.50% PF, Varies - e.g. 2.5%)</option>
+                        <option value="0.0125" data-fee="0.0500">Buy-down 9.9% (1.25% PF, Varies - e.g. 5.0%)</option>
+                    </optgroup>
+                    
+                    <optgroup label="WELLS FARGO: High Minimum ($7,500+) - NOT APPLICABLE">
+                        <option disabled value="0.014187" data-fee="0.0780">Plan 3672: 96 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
+                        <option disabled value="0.013059" data-fee="0.0830">Plan 3667: 108 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
+                        <option disabled value="0.012166" data-fee="0.0880">Plan 3668: 120 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
+                        <option disabled value="0.015228" data-fee="0.0570">Plan 3669: 96 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
+                        <option disabled value="0.014122" data-fee="0.0620">Plan 3670: 108 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
+                        <option disabled value="0.013252" data-fee="0.0670">Plan 3671: 120 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
+                    </optgroup>
+                </select>
+            </div>
+
             <label style="margin-top: 15px;">Required Deposit (%):</label>
             <select id="downPaymentPercent" onchange="calculate()">
                 <option value="0.10">10% (Standard)</option>
@@ -126,117 +229,14 @@
             <hr>
             <div class="result-row" style="margin-top: 15px;"><span>AMOUNT DUE TODAY:</span> <span id="displayDue">$0.00</span></div>
             <div class="result-row"><span>REMAINING BALANCE:</span> <span id="displayBalance">$0.00</span></div>
-        </div>
 
-        <div id="financeSection" class="section totals-box finance-box hidden">
-            <h2>Financing Options</h2>
-            <label>Select Finance Plan:</label>
-            <select id="financePlan" onchange="calculate()">
-                <option value="-1" data-fee="0">-- Select a Plan --</option>
+            <div id="financeBreakdownContainer" class="hidden" style="margin-top: 20px; padding: 15px; background: #ffffff; border-radius: 8px; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); border-left: 4px solid #f1c40f;">
+                <div class="result-row sub-text" style="color: #7f8c8d;"><span>Base Financed Balance:</span> <span id="displayBaseBalance">$0.00</span></div>
+                <div class="result-row sub-text" style="color: #e67e22;"><span>Finance Dealer Fee Added:</span> <span id="displayFinanceFee">$0.00</span></div>
+                <div class="result-row sub-text" style="font-weight: bold; color: #2c3e50;"><span>Total Financed Amount:</span> <span id="displayTotalFinanced">$0.00</span></div>
                 
-                <optgroup label="WELLS FARGO: No Interest w/ Reg Payments">
-                    <option value="0.035" data-fee="0.0175">Plan 1148: 6 Mos No Int (3.5% Min Pymt, 1.75% Fee)</option>
-                    <option value="0.035" data-fee="0.0375">Plan 1019: 12 Mos No Int (3.5% Min Pymt, 3.75% Fee)</option>
-                </optgroup>
-
-                <optgroup label="WELLS FARGO: Reduced Rate & Special APR">
-                    <option value="0.02" data-fee="0.0675">Plan 1157: 6.9% APR (2.0% Min Pymt, 6.75% Fee)</option>
-                    <option value="0.035" data-fee="0.0525">Plan 1197: 9.99% APR (3.5% Min Pymt, 5.25% Fee)</option>
-                    <option value="0.0215" data-fee="0.0400">Plan 2225: 12.9% APR (2.15% Min Pymt, 4.00% Fee)</option>
-                    <option value="0.019462" data-fee="0.1100">Plan 3198: 60 Mos @ 5.99% (1.94% PF, 11.00% Fee)</option>
-                    <option value="0.016156" data-fee="0.0495">Plan 1529: 84 Mos @ 8.99% (1.61% PF, 4.95% Fee)</option>
-                </optgroup>
-
-                <optgroup label="WELLS FARGO: 0% Interest Equal Payments">
-                    <option value="0.055555" data-fee="0.0950">Plan 4073: 18 Mos 0% Equal Pymts (9.50% Fee)</option>
-                    <option value="0.041666" data-fee="0.1100">Plan 4079: 24 Mos 0% Equal Pymts (11.00% Fee)</option>
-                    <option value="0.027777" data-fee="0.1300">Plan 4091: 36 Mos 0% Equal Pymts (13.00% Fee)</option>
-                    <option value="0.020833" data-fee="0.1625">Plan 4103: 48 Mos 0% Equal Pymts (16.25% Fee)</option>
-                    <option value="0.016666" data-fee="0.1875">Plan 4115: 60 Mos 0% Equal Pymts (18.75% Fee)</option>
-                </optgroup>
-
-                <optgroup label="SERVICE FINANCE: Deferred Int / Min Pymts">
-                    <option value="0.01" data-fee="0.0375">Plan 1006: 6 Mos Def. Int w/ Min Pymt (3.75% Fee)</option>
-                    <option value="0.01" data-fee="0.0500">Plan 1012: 12 Mos Def. Int w/ Min Pymt (5.00% Fee)</option>
-                    <option value="0.01" data-fee="0.0550">Plan 1018: 18 Mos Def. Int w/ Min Pymt (5.50% Fee)</option>
-                    <option value="0.01" data-fee="0.0775">Plan 1024: 24 Mos Def. Int w/ Min Pymt (7.75% Fee)</option>
-                </optgroup>
-                
-                <optgroup label="SERVICE FINANCE: Same As Cash (No Pymts)">
-                    <option value="0" data-fee="0.0375">Plan 2003: 3 Mos SAC (3.75% Fee)</option>
-                    <option value="0" data-fee="0.0400">Plan 2006: 6 Mos SAC (4.00% Fee)</option>
-                    <option value="0" data-fee="0.0550">Plan 2012: 12 Mos SAC (5.50% Fee)</option>
-                    <option value="0" data-fee="0.0875">Plan 2018: 18 Mos SAC (8.75% Fee)</option>
-                    <option value="0" data-fee="0.1250">Plan 2024: 24 Mos SAC (12.50% Fee)</option>
-                </optgroup>
-                
-                <optgroup label="SERVICE FINANCE: Equal Monthly Pymts (Zero Int)">
-                    <option value="0.040000" data-fee="0.0925">Plan 3025: 25 Mos Equal Pymts (9.25% Fee)</option>
-                    <option value="0.027777" data-fee="0.1300">Plan 3036: 36 Mos Equal Pymts (13.00% Fee)</option>
-                    <option value="0.020833" data-fee="0.1400">Plan 3048: 48 Mos Equal Pymts (14.00% Fee)</option>
-                    <option value="0.016666" data-fee="0.1500">Plan 3060: 60 Mos Equal Pymts (15.00% Fee)</option>
-                    <option value="0.013888" data-fee="0.1800">Plan 3072: 72 Mos Equal Pymts (18.00% Fee)</option>
-                </optgroup>
-                
-                <optgroup label="SERVICE FINANCE: Reduced Interest Loans">
-                    <option value="0.0082" data-fee="0.2100">Plan 4082: 144 Mos @ 2.99% (0.82% PF, 21.00% Fee)</option>
-                    <option value="0.0092" data-fee="0.0975">Plan 4092: 144 Mos @ 4.99% (0.92% PF, 9.75% Fee)</option>
-                    <option value="0.0071" data-fee="0.1700">Plan 4071: 240 Mos @ 5.99% (0.71% PF, 17.00% Fee)</option>
-                    <option value="0.0198" data-fee="0.0500">Plan 4198: 60 Mos @ 6.99% (1.98% PF, 5.00% Fee)</option>
-                    <option value="0.0116" data-fee="0.0500">Plan 4116: 120 Mos @ 6.99% (1.16% PF, 5.00% Fee)</option>
-                    <option value="0.0102" data-fee="0.0650">Plan 4102: 144 Mos @ 6.99% (1.02% PF, 6.50% Fee)</option>
-                    <option value="0.0089" data-fee="0.0650">Plan 4089: 180 Mos @ 6.99% (0.89% PF, 6.50% Fee)</option>
-                    <option value="0.0202" data-fee="0.0300">Plan 4202: 60 Mos @ 7.99% (2.02% PF, 3.00% Fee)</option>
-                    <option value="0.0121" data-fee="0.0300">Plan 4121: 120 Mos @ 7.99% (1.21% PF, 3.00% Fee)</option>
-                    <option value="0.0108" data-fee="0.0300">Plan 4108: 144 Mos @ 7.99% (1.08% PF, 3.00% Fee)</option>
-                    <option value="0.0096" data-fee="0.0300">Plan 4096: 180 Mos @ 7.99% (0.96% PF, 3.00% Fee)</option>
-                    <option value="0.0212" data-fee="0.0400">Plan 4212: 60 Mos @ 9.99% (2.12% PF, 4.00% Fee)</option>
-                    <option value="0.0165" data-fee="0.0490">Plan 4165: 85 Mos @ 9.99% (1.65% PF, 4.90% Fee)</option>
-                    <option value="0.0158" data-fee="0.0350">Plan 4158: 90 Mos @ 9.99% (1.58% PF, 3.50% Fee)</option>
-                    <option value="0.0150" data-fee="0.0550">Plan 4150: 97 Mos @ 9.99% (1.50% PF, 5.50% Fee)</option>
-                    <option value="0.0132" data-fee="0.0000">Plan 4132: 120 Mos @ 9.99% (1.32% PF, 0% Fee)</option>
-                    <option value="0.0119" data-fee="0.0200">Plan 4119: 144 Mos @ 9.99% (1.19% PF, 2.00% Fee)</option>
-                    <option value="0.0107" data-fee="0.0200">Plan 4107: 180 Mos @ 9.99% (1.07% PF, 2.00% Fee)</option>
-                    <option value="0.0176" data-fee="0.0200">Plan 4011: 84 Mos @ 11.99% (1.76% PF, 2.00% Fee)</option>
-                    <option value="0.0181" data-fee="0.0000">Plan 4012: 84 Mos @ 12.99% (1.81% PF, 0% Fee)</option>
-                </optgroup>
-
-                <optgroup label="SERVICE FINANCE: Hybrid Loans (Deferred Pymts)">
-                    <option value="0.0198" data-fee="0.0550">Plan 4398: 3 Mos NINP + 60 Mos @ 6.99% (1.98% PF, 5.50% Fee)</option>
-                    <option value="0.0116" data-fee="0.0550">Plan 4316: 3 Mos NINP + 120 Mos @ 6.99% (1.16% PF, 5.50% Fee)</option>
-                    <option value="0.0212" data-fee="0.0150">Plan 4312: 3 Mos NINP + 60 Mos @ 9.99% (2.12% PF, 1.50% Fee)</option>
-                    <option value="0.0132" data-fee="0.0200">Plan 4332: 3 Mos NINP + 120 Mos @ 9.99% (1.32% PF, 2.00% Fee)</option>
-                    <option value="0.0212" data-fee="0.0350">Plan 4612: 6 Mos NINP + 60 Mos @ 9.99% (2.12% PF, 3.50% Fee)</option>
-                    <option value="0.0132" data-fee="0.0500">Plan 4632: 6 Mos NINP + 120 Mos @ 9.99% (1.32% PF, 5.00% Fee)</option>
-                </optgroup>
-                
-                <optgroup label="SERVICE FINANCE: Buy Deeper Loan Options">
-                    <option value="0.01" data-fee="0.0000">Buy Deeper: 6 Month WPDI-580 FICO @ 11.95% (Standard Fee)</option>
-                    <option value="0.0138" data-fee="0.1200">Buy Deeper: 120 Mos @ 10.99% (1.38% PF, 12.00% Fee)</option>
-                    <option value="0.0171" data-fee="0.1400">Buy Deeper: 84 Mos @ 10.99% (1.71% PF, 14.00% Fee)</option>
-                </optgroup>
-
-                <optgroup label="FOUNDATION FINANCE: Revolving">
-                    <option value="0.0200" data-fee="0.0000">Standard Rate: 17.99% (2.00% PF, Free)</option>
-                    <option value="0.0150" data-fee="0.0250">Buy-down 10.9-13.5% (1.50% PF, Varies - e.g. 2.5%)</option>
-                    <option value="0.0125" data-fee="0.0500">Buy-down 9.9% (1.25% PF, Varies - e.g. 5.0%)</option>
-                </optgroup>
-                
-                <optgroup label="WELLS FARGO: High Minimum ($7,500+) - NOT APPLICABLE">
-                    <option disabled value="0.014187" data-fee="0.0780">Plan 3672: 96 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
-                    <option disabled value="0.013059" data-fee="0.0830">Plan 3667: 108 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
-                    <option disabled value="0.012166" data-fee="0.0880">Plan 3668: 120 Mos @ 7.99% (Greyed Out - N/A for Stairlifts)</option>
-                    <option disabled value="0.015228" data-fee="0.0570">Plan 3669: 96 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
-                    <option disabled value="0.014122" data-fee="0.0620">Plan 3670: 108 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
-                    <option disabled value="0.013252" data-fee="0.0670">Plan 3671: 120 Mos @ 9.99% (Greyed Out - N/A for Stairlifts)</option>
-                </optgroup>
-            </select>
-            
-            <div class="result-row sub-text" style="margin-top: 15px;"><span>Base Balance:</span> <span id="displayBaseBalance">$0.00</span></div>
-            <div class="result-row sub-text"><span>Finance Fee Added:</span> <span id="displayFinanceFee">$0.00</span></div>
-            <div class="result-row sub-text" style="font-weight: bold;"><span>Total Financed Amount:</span> <span id="displayTotalFinanced">$0.00</span></div>
-            
-            <div class="result-row" style="margin-top: 15px; font-weight: bold; font-size: 20px; color: #2c3e50;"><span>EST. MONTHLY PAYMENT:</span> <span id="displayMonthly">$0.00</span></div>
+                <div class="result-row" style="margin-top: 15px; font-weight: bold; font-size: 20px; color: #2980b9; border-bottom: none; padding-bottom: 0;"><span>EST. MONTHLY PAYMENT:</span> <span id="displayMonthly">$0.00</span></div>
+            </div>
         </div>
 
         <div class="section rep-box">
@@ -380,11 +380,15 @@
     // TOGGLE PAYMENT METHOD (SHOW/HIDE FINANCING)
     function togglePaymentMethod() {
         const method = document.getElementById('paymentMethod').value;
-        const financeSection = document.getElementById('financeSection');
+        const financePlanContainer = document.getElementById('financePlanContainer');
+        const financeBreakdownContainer = document.getElementById('financeBreakdownContainer');
+        
         if (method === 'finance') {
-            financeSection.classList.remove('hidden');
+            financePlanContainer.classList.remove('hidden');
+            financeBreakdownContainer.classList.remove('hidden');
         } else {
-            financeSection.classList.add('hidden');
+            financePlanContainer.classList.add('hidden');
+            financeBreakdownContainer.classList.add('hidden');
             document.getElementById('financePlan').value = "-1"; // Auto-reset finance dropdown if they switch back to cash/cc
         }
     }
@@ -532,7 +536,7 @@
         // $500 Admin Fee is applied ONCE per contract (Strictly excluded from commission base)
         const globalAdminFee = grandRetailBase > 0 ? 500 : 0;
         
-        // Subtotals Before Payment Processing Fees
+        // Subtotals Before Payment Processing Fees (Admin Fee is ALWAYS included in Today's Price)
         let subtotalRetail = grandRetailBase > 0 ? grandRetailBase + globalAdminFee : 0;
         let subtotalFinalPrice = grandFinalBase > 0 ? grandFinalBase + globalAdminFee : 0;
 
