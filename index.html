@@ -207,8 +207,9 @@
 
             <label style="margin-top: 15px;">Required Deposit (%):</label>
             <select id="downPaymentPercent" onchange="calculate()">
-                <option value="0.10">10% (Standard)</option>
-                <option value="0.25">25% (Helix Custom Curve / Forced)</option>
+                <option value="0.10" selected>10% (Standard)</option>
+                <option value="0.25">25% (Helix Custom Curve / Standard)</option>
+                <option value="0.00">0% (No Deposit - CSLs Require Approval)</option>
             </select>
             
             <label>Custom Flat Deposit ($) - Overrides %:</label>
@@ -329,7 +330,7 @@
         </div>
 
         <div class="cat-helix category-group hidden">
-            <div class="warning">⚠️ Helix Lifts ALWAYS require a 25% minimum deposit.</div>
+            <div class="warning">⚠️ Helix Lifts typically require a 25% minimum deposit (0% requires approval).</div>
             <label>Select Base Lift:</label>
             <select class="base-lift" onchange="calculate()">
                 <option value="0">-- Select --</option>
@@ -555,6 +556,17 @@
         // ----------------- GLOBAL MATH ----------------- //
         const globalAdminFee = grandRetailBase > 0 ? 500 : 0;
         
+        // Smart Down Payment Auto-Bump
+        const dpSelect = document.getElementById('downPaymentPercent');
+        if (hasHelix && !dpSelect.dataset.helixBumped) {
+            if (dpSelect.value === "0.10") {
+                dpSelect.value = "0.25";
+            }
+            dpSelect.dataset.helixBumped = "true";
+        } else if (!hasHelix) {
+            dpSelect.dataset.helixBumped = "";
+        }
+
         // 1. TODAY'S OFFER (Actual Contract Deal)
         let todaysSubtotal = grandFinalBase > 0 ? grandFinalBase + globalAdminFee : 0;
 
@@ -566,8 +578,7 @@
         let todaysPaymentFee = todaysSubtotal * paymentFeeRate;
         let todaysTotalBeforeFinance = todaysSubtotal + todaysPaymentFee;
 
-        let dpPercent = parseFloat(document.getElementById('downPaymentPercent').value) || 0.10;
-        if (hasHelix) dpPercent = 0.25;
+        let dpPercent = parseFloat(dpSelect.value) || 0;
         let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
         
         let todaysDeposit = dpFlat > 0 ? dpFlat : (todaysTotalBeforeFinance * dpPercent);
