@@ -246,7 +246,7 @@
                 </div>
                 
                 <div class="result-row sub-text" id="processingFeeRow" style="display: none; color: #e67e22;">
-                    <span>Processing Fee (<span id="displayFeePercent">0%</span>):</span> 
+                    <span><span id="feeLabelName">Processing Fee</span> (<span id="displayFeePercent">0%</span>):</span> 
                     <span id="displayFeeAmount">+$0.00</span>
                 </div>
 
@@ -256,9 +256,10 @@
                 </div>
 
                 <div id="financeBreakdownContainer" class="hidden" style="margin-top: 10px;">
-                    <div class="result-row sub-text"><span>Base Financed Balance:</span> <span id="displayBaseBalance">$0.00</span></div>
-                    <div class="result-row sub-text" style="color: #e67e22;"><span>Finance Dealer Fee Added:</span> <span id="displayFinanceFee">$0.00</span></div>
-                    <div class="result-row sub-text" style="font-weight: bold;"><span>Total Financed Amount:</span> <span id="displayTotalFinanced">$0.00</span></div>
+                    <div class="result-row sub-text" style="font-weight: bold; color: #2980b9;">
+                        <span>Total Financed Amount (Remaining Balance):</span> 
+                        <span id="displayTotalFinanced">$0.00</span>
+                    </div>
                 </div>
 
                 <div style="font-size: 11px; text-align: right; margin-top: 15px; color: #95a5a6;">
@@ -570,70 +571,53 @@
         let retailSubtotal = grandRetailBase > 0 ? grandRetailBase + globalAdminFee : 0;
         let discountSubtotal = grandFinalBase > 0 ? grandFinalBase + globalAdminFee : 0;
 
-        // --- PAYMENT METHOD FEES (Gross-Up Method) ---
+        // --- PAYMENT METHOD FEES (Gross-Up Method to apply to Total Price) ---
         let paymentMethod = document.getElementById('paymentMethod').value;
-        let paymentFeeRate = 0;
-        if (paymentMethod === 'cc') paymentFeeRate = 0.03;
-        if (paymentMethod === 'amex') paymentFeeRate = 0.05;
+        let isFinance = (paymentMethod === 'finance');
+        let feeRate = 0;
+        let pfRate = 0;
 
-        // Retail CC/Amex Gross-Up
-        let retailTotalBeforeFinance = retailSubtotal > 0 ? (retailSubtotal / (1 - paymentFeeRate)) : 0;
-        let retailPaymentFee = retailTotalBeforeFinance - retailSubtotal;
+        if (paymentMethod === 'cc') feeRate = 0.03;
+        else if (paymentMethod === 'amex') feeRate = 0.05;
+        else if (isFinance) {
+            let financeSelect = document.getElementById('financePlan');
+            let selectedOption = financeSelect.options[financeSelect.selectedIndex];
+            pfRate = parseFloat(selectedOption.value) || 0;
+            feeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
+        }
 
-        // Discounted CC/Amex Gross-Up
-        let discountTotalBeforeFinance = discountSubtotal > 0 ? (discountSubtotal / (1 - paymentFeeRate)) : 0;
-        let discountPaymentFee = discountTotalBeforeFinance - discountSubtotal;
+        // Apply Gross-up to Retail Anchor
+        let retailAbsoluteTotal = retailSubtotal > 0 && feeRate < 1 ? (retailSubtotal / (1 - feeRate)) : retailSubtotal;
+        
+        // Apply Gross-up to Today's Discounted Offer
+        let todaysAbsoluteTotal = discountSubtotal > 0 && feeRate < 1 ? (discountSubtotal / (1 - feeRate)) : discountSubtotal;
+        let todaysFeeAmount = todaysAbsoluteTotal - discountSubtotal; // The actual dollar amount added to cover the bank/card fee
 
         // --- DEPOSITS ---
         let dpPercent = parseFloat(dpSelect.value) || 0;
         let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
         
-        let discountDeposit = dpFlat > 0 ? dpFlat : (discountTotalBeforeFinance * dpPercent);
+        let discountDeposit = dpFlat > 0 ? dpFlat : (todaysAbsoluteTotal * dpPercent);
         if (hasUplift && dpFlat === 0 && dpPercent > 0 && discountDeposit < 1000) {
             discountDeposit = 1000;
         }
 
-        let retailDeposit = dpFlat > 0 ? dpFlat : (retailTotalBeforeFinance * dpPercent);
+        // Fluff the Retail Anchor
+        let fluffedTotalRetail = retailAbsoluteTotal * (1 + globalFluffRate);
+        
+        let retailDeposit = dpFlat > 0 ? dpFlat : (fluffedTotalRetail * dpPercent);
         if (hasUplift && dpFlat === 0 && dpPercent > 0 && retailDeposit < 1000) {
             retailDeposit = 1000;
         }
 
-        // --- BALANCES ---
-        let discountBalance = discountTotalBeforeFinance - discountDeposit;
+        // --- BALANCES & MONTHLY ---
+        let discountBalance = todaysAbsoluteTotal - discountDeposit;
         if (discountBalance < 0) discountBalance = 0;
+        let todaysMonthly = discountBalance * pfRate;
 
-        let retailBalance = retailTotalBeforeFinance - retailDeposit;
+        let retailBalance = fluffedTotalRetail - retailDeposit;
         if (retailBalance < 0) retailBalance = 0;
-
-        // --- FINANCE FEES (Gross-Up Method) ---
-        let financeSelect = document.getElementById('financePlan');
-        let selectedOption = financeSelect.options[financeSelect.selectedIndex];
-        let pfRate = parseFloat(selectedOption.value) || 0;
-        let dealerFeeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
-
-        let discountTotalFinanced = discountBalance;
-        let discountFinanceFee = 0;
-        
-        let retailTotalFinanced = retailBalance;
-        let retailFinanceFee = 0;
-
-        if (paymentMethod === 'finance' && dealerFeeRate > 0 && dealerFeeRate < 1) {
-            discountTotalFinanced = discountBalance / (1 - dealerFeeRate);
-            discountFinanceFee = discountTotalFinanced - discountBalance;
-
-            retailTotalFinanced = retailBalance / (1 - dealerFeeRate);
-            retailFinanceFee = retailTotalFinanced - retailBalance;
-        }
-
-        // --- FINAL TOTALS (Today's Offer vs Retail Anchor) ---
-        let todaysAbsoluteTotal = grandRetailBase > 0 ? (discountDeposit + discountTotalFinanced) : 0;
-        let todaysMonthly = discountTotalFinanced * pfRate;
-
-        let retailAbsoluteTotal = grandRetailBase > 0 ? (retailDeposit + retailTotalFinanced) : 0;
-        
-        let fluffedTotalRetail = retailAbsoluteTotal * (1 + globalFluffRate);
-        let fluffedFinancedAmount = retailTotalFinanced * (1 + globalFluffRate);
-        let fluffedMonthlyRetail = fluffedFinancedAmount * pfRate;
+        let fluffedMonthlyRetail = retailBalance * pfRate;
 
         // --- COMMISSION LOGIC ---
         let totalDiscountAmount = grandRetailBase - grandFinalBase;
@@ -655,7 +639,7 @@
         let masterCommission = 0;
         let breakdownHTML = "";
 
-        if (isFlat) {
+        if (isFlat && grandRetailBase > 0) {
             masterCommission = 200;
             breakdownHTML = `<div class="breakdown-row"><span>Total Order Flat Payout:</span> <span style="font-weight: bold; color: #27ae60;">$200.00</span></div>`;
         } else {
@@ -688,11 +672,13 @@
         document.getElementById('displayDiscountPercent').innerText = grandRetailBase > 0 ? parseFloat(effectiveDiscountPercent.toFixed(1)) + "%" : "0%";
         document.getElementById('displayDiscountAmount').innerText = grandRetailBase > 0 ? "-" + formatMoney(totalDiscountAmount) : "-$0.00";
         
+        // Unified UI row handles CC, Amex, AND Finance fee additions
         const feeRow = document.getElementById('processingFeeRow');
-        if (paymentFeeRate > 0 && grandRetailBase > 0) {
+        if (feeRate > 0 && grandRetailBase > 0) {
             feeRow.style.display = 'flex';
-            document.getElementById('displayFeePercent').innerText = (paymentFeeRate * 100) + "%";
-            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(discountPaymentFee);
+            document.getElementById('feeLabelName').innerText = isFinance ? "Finance Dealer Fee" : "Processing Fee";
+            document.getElementById('displayFeePercent').innerText = parseFloat((feeRate * 100).toFixed(2)) + "%";
+            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(todaysFeeAmount);
         } else {
             feeRow.style.display = 'none';
         }
@@ -704,14 +690,12 @@
         const todayMonthlyRow = document.getElementById('todayMonthlyRow');
         const financeBreakdownContainer = document.getElementById('financeBreakdownContainer');
 
-        if (paymentMethod === 'finance' && financeSelect.value !== "-1" && grandRetailBase > 0) {
+        if (isFinance && document.getElementById('financePlan').value !== "-1" && grandRetailBase > 0) {
             financeBreakdownContainer.classList.remove('hidden');
             retailMonthlyRow.style.display = 'flex';
             todayMonthlyRow.style.display = 'flex';
             
-            document.getElementById('displayBaseBalance').innerText = formatMoney(discountBalance);
-            document.getElementById('displayFinanceFee').innerText = formatMoney(discountFinanceFee);
-            document.getElementById('displayTotalFinanced').innerText = formatMoney(discountTotalFinanced);
+            document.getElementById('displayTotalFinanced').innerText = formatMoney(discountBalance);
 
             if (pfRate > 0) {
                 document.getElementById('displayRetailMonthly').innerText = formatMoney(fluffedMonthlyRetail) + " /mo";
