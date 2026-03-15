@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stairlift Price Calculator by ALFA Corp</title>
+    <title>Stairlift Price Calculator by ALFA Industries LLC</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
         
@@ -58,9 +58,9 @@
 
 <div id="loginScreen">
     <div class="login-card">
-        <img src="image.WEBP" alt="ALFA Corp Logo" class="logo-img" onerror="this.style.display='none'">
+        <img src="image.WEBP" alt="ALFA Industries LLC Logo" class="logo-img" onerror="this.style.display='none'">
         <div class="logo-text">Stairlift <span class="blue">Price Calculator</span></div>
-        <p class="subtitle">by ALFA Corp</p>
+        <p class="subtitle">by ALFA Industries LLC</p>
         
         <div class="confidential-warning">
             Proprietary Sales Tool.<br>Authorized Personnel Only.
@@ -77,7 +77,7 @@
     <div class="container">
         <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px;">
             <h1 style="color: #2c3e50; font-size: 28px; margin-bottom: 5px;">Stairlift Price Calculator</h1>
-            <p style="margin: 0; color: #7f8c8d; font-size: 14px; font-weight: bold; text-transform: uppercase;">by ALFA Corp</p>
+            <p style="margin: 0; color: #7f8c8d; font-size: 14px; font-weight: bold; text-transform: uppercase;">by ALFA Industries LLC</p>
         </div>
 
         <div id="lifts-container"></div>
@@ -556,7 +556,6 @@
         // ----------------- GLOBAL MATH ----------------- //
         const globalAdminFee = grandRetailBase > 0 ? 500 : 0;
         
-        // Smart Down Payment Auto-Bump
         const dpSelect = document.getElementById('downPaymentPercent');
         if (hasHelix && !dpSelect.dataset.helixBumped) {
             if (dpSelect.value === "0.10") {
@@ -567,63 +566,76 @@
             dpSelect.dataset.helixBumped = "";
         }
 
-        // 1. TODAY'S OFFER (Actual Contract Deal)
-        let todaysSubtotal = grandFinalBase > 0 ? grandFinalBase + globalAdminFee : 0;
+        // --- SUB-TOTALS ---
+        let retailSubtotal = grandRetailBase > 0 ? grandRetailBase + globalAdminFee : 0;
+        let discountSubtotal = grandFinalBase > 0 ? grandFinalBase + globalAdminFee : 0;
 
+        // --- PAYMENT METHOD FEES (Gross-Up Method) ---
         let paymentMethod = document.getElementById('paymentMethod').value;
         let paymentFeeRate = 0;
         if (paymentMethod === 'cc') paymentFeeRate = 0.03;
         if (paymentMethod === 'amex') paymentFeeRate = 0.05;
 
-        let todaysPaymentFee = todaysSubtotal * paymentFeeRate;
-        let todaysTotalBeforeFinance = todaysSubtotal + todaysPaymentFee;
+        // Retail CC/Amex Gross-Up
+        let retailTotalBeforeFinance = retailSubtotal > 0 ? (retailSubtotal / (1 - paymentFeeRate)) : 0;
+        let retailPaymentFee = retailTotalBeforeFinance - retailSubtotal;
 
+        // Discounted CC/Amex Gross-Up
+        let discountTotalBeforeFinance = discountSubtotal > 0 ? (discountSubtotal / (1 - paymentFeeRate)) : 0;
+        let discountPaymentFee = discountTotalBeforeFinance - discountSubtotal;
+
+        // --- DEPOSITS ---
         let dpPercent = parseFloat(dpSelect.value) || 0;
         let dpFlat = parseFloat(document.getElementById('downPaymentFlat').value) || 0;
         
-        let todaysDeposit = dpFlat > 0 ? dpFlat : (todaysTotalBeforeFinance * dpPercent);
-        if (hasUplift && dpFlat === 0 && todaysDeposit > 0 && todaysDeposit < 1000) {
-            todaysDeposit = 1000;
+        let discountDeposit = dpFlat > 0 ? dpFlat : (discountTotalBeforeFinance * dpPercent);
+        if (hasUplift && dpFlat === 0 && dpPercent > 0 && discountDeposit < 1000) {
+            discountDeposit = 1000;
         }
 
-        let todaysBalance = grandRetailBase === 0 ? 0 : todaysTotalBeforeFinance - todaysDeposit;
-        if (todaysBalance < 0) todaysBalance = 0; 
+        let retailDeposit = dpFlat > 0 ? dpFlat : (retailTotalBeforeFinance * dpPercent);
+        if (hasUplift && dpFlat === 0 && dpPercent > 0 && retailDeposit < 1000) {
+            retailDeposit = 1000;
+        }
 
+        // --- BALANCES ---
+        let discountBalance = discountTotalBeforeFinance - discountDeposit;
+        if (discountBalance < 0) discountBalance = 0;
+
+        let retailBalance = retailTotalBeforeFinance - retailDeposit;
+        if (retailBalance < 0) retailBalance = 0;
+
+        // --- FINANCE FEES (Gross-Up Method) ---
         let financeSelect = document.getElementById('financePlan');
         let selectedOption = financeSelect.options[financeSelect.selectedIndex];
         let pfRate = parseFloat(selectedOption.value) || 0;
         let dealerFeeRate = parseFloat(selectedOption.getAttribute('data-fee')) || 0;
 
-        let todaysFinanceFee = (paymentMethod === 'finance') ? (todaysBalance * dealerFeeRate) : 0;
-        let todaysTotalFinanced = todaysBalance + todaysFinanceFee;
+        let discountTotalFinanced = discountBalance;
+        let discountFinanceFee = 0;
         
-        let todaysAbsoluteTotal = grandRetailBase > 0 ? (todaysDeposit + todaysTotalFinanced) : 0;
-        let todaysMonthly = todaysTotalFinanced * pfRate;
+        let retailTotalFinanced = retailBalance;
+        let retailFinanceFee = 0;
 
-        // 2. RETAIL PRICE (1 Year Anchor)
-        let retailSubtotal = grandRetailBase > 0 ? grandRetailBase + globalAdminFee : 0;
-        let retailPaymentFee = retailSubtotal * paymentFeeRate;
-        let retailTotalBeforeFinance = retailSubtotal + retailPaymentFee;
-        
-        let retailDeposit = dpFlat > 0 ? dpFlat : (retailTotalBeforeFinance * dpPercent);
-        if (hasUplift && dpFlat === 0 && retailDeposit > 0 && retailDeposit < 1000) {
-            retailDeposit = 1000;
+        if (paymentMethod === 'finance' && dealerFeeRate > 0 && dealerFeeRate < 1) {
+            discountTotalFinanced = discountBalance / (1 - dealerFeeRate);
+            discountFinanceFee = discountTotalFinanced - discountBalance;
+
+            retailTotalFinanced = retailBalance / (1 - dealerFeeRate);
+            retailFinanceFee = retailTotalFinanced - retailBalance;
         }
-        
-        let retailBalance = retailTotalBeforeFinance - retailDeposit;
-        if (retailBalance < 0) retailBalance = 0;
-        
-        let retailFinanceFee = (paymentMethod === 'finance') ? (retailBalance * dealerFeeRate) : 0;
-        let retailTotalFinanced = retailBalance + retailFinanceFee;
+
+        // --- FINAL TOTALS (Today's Offer vs Retail Anchor) ---
+        let todaysAbsoluteTotal = grandRetailBase > 0 ? (discountDeposit + discountTotalFinanced) : 0;
+        let todaysMonthly = discountTotalFinanced * pfRate;
 
         let retailAbsoluteTotal = grandRetailBase > 0 ? (retailDeposit + retailTotalFinanced) : 0;
         
-        // Fluff the Retail
         let fluffedTotalRetail = retailAbsoluteTotal * (1 + globalFluffRate);
         let fluffedFinancedAmount = retailTotalFinanced * (1 + globalFluffRate);
         let fluffedMonthlyRetail = fluffedFinancedAmount * pfRate;
 
-        // COMMISSION LOGIC
+        // --- COMMISSION LOGIC ---
         let totalDiscountAmount = grandRetailBase - grandFinalBase;
         let effectiveDiscountPercent = grandRetailBase > 0 ? (totalDiscountAmount / grandRetailBase) * 100 : 0;
 
@@ -636,36 +648,40 @@
             else if (effectiveDiscountPercent <= 15.01) { tierRate = 0.10; tierText = "10%"; }
             else if (effectiveDiscountPercent <= 20.01) { tierRate = 0.08; tierText = "8%"; }
             else if (effectiveDiscountPercent <= 25.01) { tierRate = 0.05; tierText = "5% (PAR)"; }
-            else if (effectiveDiscountPercent <= 40.01) { isFlat = true; tierText = "Flat $200 (Per Lift)"; }
+            else if (effectiveDiscountPercent <= 40.01) { isFlat = true; tierText = "Flat $200 (Entire Order)"; }
             else { tierRate = 0; tierText = "0% (Max discount exceeded)"; }
         }
 
         let masterCommission = 0;
         let breakdownHTML = "";
 
-        liftsData.forEach(lift => {
-            let liftComm = 0;
-            if (lift.retail > 0) {
-                if (isFlat) liftComm = 200;
-                else if (tierRate > 0) liftComm = lift.final * tierRate;
-            }
-            masterCommission += liftComm;
-            breakdownHTML += `<div class="breakdown-row"><span>${lift.name} Payout:</span> <span style="font-weight: bold; color: #27ae60;">${formatMoney(liftComm)}</span></div>`;
-        });
+        if (isFlat) {
+            masterCommission = 200;
+            breakdownHTML = `<div class="breakdown-row"><span>Total Order Flat Payout:</span> <span style="font-weight: bold; color: #27ae60;">$200.00</span></div>`;
+        } else {
+            liftsData.forEach(lift => {
+                let liftComm = 0;
+                if (lift.retail > 0 && tierRate > 0) {
+                    liftComm = lift.final * tierRate;
+                }
+                masterCommission += liftComm;
+                breakdownHTML += `<div class="breakdown-row"><span>${lift.name} Payout:</span> <span style="font-weight: bold; color: #27ae60;">${formatMoney(liftComm)}</span></div>`;
+            });
+        }
 
         document.getElementById('displayGlobalRepDiscount').innerText = parseFloat(effectiveDiscountPercent.toFixed(1)) + "%";
         document.getElementById('displayCommTier').innerText = tierText;
         document.getElementById('displayCommission').innerText = grandRetailBase > 0 ? formatMoney(masterCommission) : "$0.00";
         
         const breakdownContainer = document.getElementById('commBreakdownContainer');
-        if (liftsData.length > 1 && grandRetailBase > 0) {
+        if (liftsData.length > 0 && grandRetailBase > 0) {
             document.getElementById('commBreakdownList').innerHTML = breakdownHTML;
             breakdownContainer.classList.remove('hidden');
         } else {
             breakdownContainer.classList.add('hidden');
         }
         
-        // CUSTOMER PRESENTATION UI UPDATES
+        // --- CUSTOMER PRESENTATION UI UPDATES ---
         document.getElementById('displayRetailTotal').innerText = grandRetailBase > 0 ? formatMoney(fluffedTotalRetail) : "$0.00";
         document.getElementById('displayTodayTotal').innerText = grandRetailBase > 0 ? formatMoney(todaysAbsoluteTotal) : "$0.00";
         
@@ -676,12 +692,12 @@
         if (paymentFeeRate > 0 && grandRetailBase > 0) {
             feeRow.style.display = 'flex';
             document.getElementById('displayFeePercent').innerText = (paymentFeeRate * 100) + "%";
-            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(todaysPaymentFee);
+            document.getElementById('displayFeeAmount').innerText = "+" + formatMoney(discountPaymentFee);
         } else {
             feeRow.style.display = 'none';
         }
 
-        document.getElementById('displayDue').innerText = grandRetailBase > 0 ? formatMoney(todaysDeposit) : "$0.00";
+        document.getElementById('displayDue').innerText = grandRetailBase > 0 ? formatMoney(discountDeposit) : "$0.00";
         
         // FINANCING UI LOGIC
         const retailMonthlyRow = document.getElementById('retailMonthlyRow');
@@ -693,9 +709,9 @@
             retailMonthlyRow.style.display = 'flex';
             todayMonthlyRow.style.display = 'flex';
             
-            document.getElementById('displayBaseBalance').innerText = formatMoney(todaysBalance);
-            document.getElementById('displayFinanceFee').innerText = formatMoney(todaysFinanceFee);
-            document.getElementById('displayTotalFinanced').innerText = formatMoney(todaysTotalFinanced);
+            document.getElementById('displayBaseBalance').innerText = formatMoney(discountBalance);
+            document.getElementById('displayFinanceFee').innerText = formatMoney(discountFinanceFee);
+            document.getElementById('displayTotalFinanced').innerText = formatMoney(discountTotalFinanced);
 
             if (pfRate > 0) {
                 document.getElementById('displayRetailMonthly').innerText = formatMoney(fluffedMonthlyRetail) + " /mo";
